@@ -1,7 +1,9 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -62,6 +64,12 @@ func NewConfig(configFile string) (*Config, error) {
 	err := viper.Unmarshal(&config)
 	if err != nil {
 		return nil, err
+	}
+
+	if portStr := os.Getenv("PORT"); portStr != "" {
+		if p, err := strconv.Atoi(portStr); err == nil && config.HTTPServer != nil {
+			config.HTTPServer.Port = p
+		}
 	}
 
 	return &config, nil

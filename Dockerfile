@@ -48,3 +48,5 @@ ARG WAIT_VERSION=2.12.1
 ADD --chmod=755 https://github.com/ufoscout/docker-compose-wait/releases/download/${WAIT_VERSION}/wait${WAIT_ARCH} /bin/wait
 
 WORKDIR /app
+
+CMD ["./seonaut", "-c", "config"]

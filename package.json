@@ -1,0 +1,10 @@
+{
+  "name": "seonaut",
+  "version": "1.0.0",
+  "description": "SEO Crawler and Website Auditor",
+  "scripts": {
+    "build": "make front",
+    "start": "./seonaut -c config"
+  },
+  "dependencies": {}
+}

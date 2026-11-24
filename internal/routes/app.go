@@ -70,6 +70,12 @@ func NewServer(container *services.Container) {
 	resourceHandler := resourceHandler{container}
 	http.HandleFunc("GET /resources", container.CookieSession.Auth(resourceHandler.indexHandler))
 
+	// Tools routes
+	toolsHandler := toolsHandler{container}
+	http.HandleFunc("GET /tools", container.CookieSession.Auth(toolsHandler.indexHandler))
+	http.HandleFunc("GET /api/keywords", container.CookieSession.Auth(toolsHandler.keywordApiHandler))
+	http.HandleFunc("GET /api/long-tail", container.CookieSession.Auth(toolsHandler.longTailApiHandler))
+
 	// Archive Handler
 	archiveHandler := archiveHandler{container}
 	http.HandleFunc("GET /archive", container.CookieSession.Auth(archiveHandler.archiveHandler))

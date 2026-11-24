@@ -1,0 +1,746 @@
+{{ template "head" . }}
+<script src="/resources/echarts.min.js"></script>
+
+<div class="panel">
+	<div class="box box-first box-highlight">
+		<div class="col col-main">
+			<div class="content content-centered">
+				<div>
+					<h2>SEO Assistant & Optimizer Tools</h2>
+					<p>Generate optimized title tags, meta descriptions, content scores, checklist tooltips, long-tail keyword suggestions, and ECharts visualizations.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Grid Layout: Generator & SEO Checklist Sidebar -->
+	<div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; align-items:start;" id="tools_grid">
+
+		<!-- Left Column: Generator & SERP Simulator -->
+		<div>
+			<div class="box" style="margin-top:0;">
+				<div class="col col-main">
+					<div class="content">
+						<h3>Title Tag & Meta Description Generator & SERP Simulator</h3>
+						<p>Enter your target topic or primary keyword and content summary to generate tags and preview them in a simulated Google SERP.</p>
+						
+						<div style="margin-top: 15px;">
+							<label for="gen_keyword">Primary Keyword / Topic</label>
+							<input type="text" id="gen_keyword" placeholder="e.g. Best Coffee Maker 2026" style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;">
+
+							<label for="gen_summary">Content Summary / Selling Points</label>
+							<textarea id="gen_summary" rows="3" placeholder="e.g. Compare top-rated espresso machines, user reviews, pricing, and buying guide." style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;"></textarea>
+
+							<button type="button" id="generate_btn" style="background:#2563eb; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Generate Optimized Tags & SERP Preview</button>
+						</div>
+
+						<div id="generator_results" style="margin-top: 25px; display: none;">
+							<hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+							
+							<!-- Content Score Preview Component -->
+							<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:25px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+								<div>
+									<h4 style="margin:0 0 5px 0; color:#1e293b;">SEO Content Score</h4>
+									<p style="margin:0; font-size:13px; color:#64748b;">Evaluated based on title & meta description optimal lengths.</p>
+								</div>
+								<div style="display:flex; align-items:center; gap:15px;">
+									<div id="score_badge" style="width:70px; height:70px; border-radius:50%; background:#2563eb; color:white; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold;">0</div>
+									<div>
+										<div id="score_label" style="font-weight:700; font-size:16px; color:#0f172a;">Pending</div>
+										<div id="score_feedback" style="font-size:12px; color:#475569; max-width:280px;">Generate tags to calculate content score.</div>
+									</div>
+								</div>
+							</div>
+
+							<h4>Generated Title Tag (Editable)</h4>
+							<div style="display:flex; align-items:center; gap:10px; margin-top:5px; margin-bottom:15px;">
+								<input type="text" id="res_title" oninput="onTagInput()" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ccc; background:#fff;">
+								<span id="title_count" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:4px;">0 chars</span>
+								<button type="button" onclick="copyText('res_title')" style="padding:10px 15px; cursor:pointer;">Copy Title</button>
+							</div>
+
+							<h4>Generated Meta Description (Editable)</h4>
+							<div style="display:flex; align-items:center; gap:10px; margin-top:5px; margin-bottom:15px;">
+								<input type="text" id="res_desc" oninput="onTagInput()" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ccc; background:#fff;">
+								<span id="desc_count" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:4px;">0 chars</span>
+								<button type="button" onclick="copyText('res_desc')" style="padding:10px 15px; cursor:pointer;">Copy Desc</button>
+							</div>
+
+							<div style="margin-top: 15px; margin-bottom: 25px;">
+								<button type="button" onclick="exportMetaCSV()" style="background:#0284c7; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">📥 Export Meta Tags & Score to CSV</button>
+							</div>
+
+							<!-- Visual Google SERP Simulator Component -->
+							<h4 style="margin-top:20px; display:flex; align-items:center; justify-content:space-between;">
+								<span>Google Search Result Page (SERP) Simulator</span>
+								<span style="font-size:12px; font-weight:normal; background:#e2e8f0; padding:4px 8px; border-radius:4px;">
+									<button type="button" onclick="setSerpMode('desktop')" id="btn_desktop" style="border:none; background:#2563eb; color:white; padding:2px 8px; border-radius:3px; cursor:pointer; font-size:11px;">Desktop View</button>
+									<button type="button" onclick="setSerpMode('mobile')" id="btn_mobile" style="border:none; background:transparent; color:#334155; padding:2px 8px; border-radius:3px; cursor:pointer; font-size:11px;">Mobile View</button>
+								</span>
+							</h4>
+							<div id="serp_container" style="border:1px solid #dfe1e5; border-radius:12px; padding:20px; background:#fff; max-width:600px; font-family:Arial,sans-serif; box-shadow:0 1px 6px rgba(32,33,36,.1); transition: all 0.3s ease; position:relative;">
+								<button type="button" onclick="copySerpSnippet()" style="position:absolute; top:15px; right:15px; background:#f1f3f4; border:1px solid #dadce0; border-radius:4px; padding:4px 10px; font-size:11px; cursor:pointer; font-weight:600; color:#3c4043;">📋 Copy Snippet</button>
+								<div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+									<div style="width:26px; height:26px; border-radius:50%; background:#f1f3f4; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:#5f6368;">S</div>
+									<div>
+										<div style="font-size:12px; color:#202124; line-height:1.2; font-weight:500;">SEOnaut Site Auditor</div>
+										<div style="font-size:11px; color:#5f6368; line-height:1.2;">https://example.com › seo-tool-page</div>
+									</div>
+								</div>
+								<div id="preview_title" style="font-size:20px; color:#1a0dab; line-height:1.3; cursor:pointer; margin-bottom:4px; font-weight:400;">Page Title Preview</div>
+								<div id="preview_desc" style="font-size:14px; color:#4d5156; line-height:1.5;">Meta description preview will appear here...</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Right Column: SEO Best Practices Checklist Sidebar with Hover Tooltips -->
+		<div>
+			<div class="box" style="margin-top:0; background:#f8fafc; border:1px solid #e2e8f0;">
+				<div class="col col-main">
+					<div class="content">
+						<h3 style="font-size:16px; margin-top:0; color:#0f172a;">SEO Best Practices Checklist</h3>
+						<p style="font-size:13px; color:#64748b;">Hover over items for details on why they matter.</p>
+						
+						<ul id="checklist_ul" style="list-style:none; padding:0; margin:15px 0 0 0; font-size:13px;">
+							<li id="chk_keyword" title="Including the primary keyword in your title tag helps search engines and users instantly recognize relevance." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Target keyword present in Title</li>
+							<li id="chk_title_len" title="Keeping title tags between 50-60 characters prevents truncation in Google search result pages." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Title length optimal (50–60 chars)</li>
+							<li id="chk_desc_len" title="Meta descriptions between 120-155 characters provide a complete pitch without getting cut off." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Description optimal (120–155 chars)</li>
+							<li id="chk_cta" title="Actionable verbs like Discover, Compare, or Learn improve click-through rates (CTR) in search results." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Actionable CTA in Description</li>
+							<li id="chk_alt" title="Alt text improves accessibility and helps image search indexing." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#15803d; cursor:help;">✔ Images have alt text verified</li>
+							<li id="chk_url" title="Clean, descriptive URLs improve user trust and click-through rates." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#15803d; cursor:help;">✔ Clean slug & URL structure</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Tool 3: Bulk CSV Keyword Generator -->
+	<div class="box">
+		<div class="col col-main">
+			<div class="content">
+				<h3>Bulk CSV Meta Tag Generator</h3>
+				<p>Upload a CSV file containing multiple target keywords (format: <code>keyword,summary</code>) to generate meta tags for all of them in bulk.</p>
+				
+				<div style="display:flex; gap:10px; align-items:center; margin-top:15px; margin-bottom:20px; flex-wrap:wrap;">
+					<input type="file" id="bulk_csv_file" accept=".csv" style="padding:8px; border:1px solid #ccc; border-radius:6px; background:#fff;">
+					<button type="button" id="process_bulk_btn" style="background:#7c3aed; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Process Bulk CSV</button>
+					<a href="#" onclick="downloadCsvTemplate(event)" style="font-size:13px; color:#2563eb; text-decoration:underline;">Download CSV Template</a>
+				</div>
+
+				<div id="bulk_results_container" style="display:none; overflow-x:auto; margin-top:15px;">
+					<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+						<h4 style="margin:0;">Bulk Generation Results</h4>
+						<button type="button" onclick="exportBulkCSV()" style="background:#0284c7; color:white; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600;">📥 Download Bulk CSV Report</button>
+					</div>
+					<table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+						<thead>
+							<tr style="background:#f3f4f6; border-bottom:2px solid #e5e7eb;">
+								<th style="padding:10px;">Keyword</th>
+								<th style="padding:10px;">Generated Title Tag</th>
+								<th style="padding:10px;">Generated Meta Description</th>
+								<th style="padding:10px;">Score</th>
+							</tr>
+						</thead>
+						<tbody id="bulk_table_body">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Tool 4: Keyword Research Component, Long-Tail Suggestions & ECharts Visualizations -->
+	<div class="box">
+		<div class="col col-main">
+			<div class="content">
+				<h3>Keyword Research, Long-Tail Suggestions & ECharts Visualizations</h3>
+				<p>Fetch search volume, CPC, competition data, calculated SEO Difficulty Scores, and long-tail suggestions for any seed keyword.</p>
+
+				<div style="display:flex; gap:10px; align-items:center; margin-top:15px; margin-bottom:10px; flex-wrap:wrap;">
+					<input type="text" id="kw_query" placeholder="Enter seed keyword (e.g. cloud hosting, running shoes)..." style="flex:1; min-width:250px; padding:10px; border-radius:6px; border:1px solid #ccc;">
+					<button type="button" id="search_kw_btn" style="background:#16a34a; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Fetch Keyword Data</button>
+					<button type="button" id="long_tail_btn" style="background:#0ea5e9; color:white; padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">💡 Get Long-Tail Suggestions</button>
+				</div>
+
+				<!-- Long-Tail Suggestions Container -->
+				<div id="long_tail_container" style="display:none; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:15px; margin-bottom:15px;">
+					<h4 style="margin:0 0 8px 0; color:#0369a1; font-size:14px;">Long-Tail Keyword Strategy Suggestions</h4>
+					<div id="long_tail_chips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+				</div>
+
+				<!-- LocalStorage Search History Chips -->
+				<div id="history_section" style="margin-bottom:15px; display:none;">
+					<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
+						<span style="font-size:12px; font-weight:600; color:#6b7280;">Recent Searches (localStorage):</span>
+						<button type="button" onclick="clearKeywordHistory()" style="background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer; text-decoration:underline;">Clear History</button>
+					</div>
+					<div id="history_chips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+				</div>
+
+				<div id="kw_loading" style="display:none; color:#6b7280; font-style:italic; margin-bottom:15px;">Fetching search volume and competition metrics...</div>
+
+				<div id="kw_results_container" style="display:none;">
+					<!-- ECharts Visualization 1: Competition & Volume -->
+					<div style="margin-top:20px; margin-bottom:20px; border:1px solid #e2e8f0; border-radius:10px; padding:15px; background:#fafafa;">
+						<h4 style="margin:0 0 10px 0; color:#1e293b; font-size:15px;">Keyword Competition & Search Volume</h4>
+						<div id="competition_chart" style="width:100%; height:300px;"></div>
+					</div>
+
+					<!-- ECharts Visualization 2: 12-Month Search Volume Trend -->
+					<div style="margin-bottom:25px; border:1px solid #e2e8f0; border-radius:10px; padding:15px; background:#fafafa;">
+						<h4 id="trend_chart_title" style="margin:0 0 10px 0; color:#1e293b; font-size:15px;">12-Month Search Volume Trend</h4>
+						<div id="trend_chart" style="width:100%; height:280px;"></div>
+					</div>
+
+					<h4 style="margin-bottom:10px;">Detailed Keyword Results Table</h4>
+					<div style="overflow-x:auto;">
+						<table style="width:100%; border-collapse:collapse; margin-top:5px; text-align:left; font-size:14px;">
+							<thead>
+								<tr style="background:#f3f4f6; border-bottom:2px solid #e5e7eb;">
+									<th style="padding:12px;">Keyword</th>
+									<th style="padding:12px;">Search Volume (Mo.)</th>
+									<th style="padding:12px;">Est. CPC</th>
+									<th style="padding:12px;">Competition</th>
+									<th style="padding:12px;">Difficulty</th>
+									<th style="padding:12px;">SEO Diff Score (0-100)</th>
+								</tr>
+							</thead>
+							<tbody id="kw_table_body">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	let competitionChartInstance = null;
+	let trendChartInstance = null;
+	let bulkGeneratedData = [];
+
+	// Title & Meta Generator logic
+	document.getElementById('generate_btn').addEventListener('click', function() {
+		let keyword = document.getElementById('gen_keyword').value.trim() || 'SEO Optimization';
+		let summary = document.getElementById('gen_summary').value.trim() || 'Comprehensive guide and expert tips to improve website ranking and traffic.';
+
+		let title = keyword.charAt(0).toUpperCase() + keyword.slice(1) + ' | Ultimate Guide & Tips (2026)';
+		if (title.length > 60) {
+			title = keyword + ' Guide (2026)';
+		}
+
+		let desc = 'Discover everything you need to know about ' + keyword + '. ' + summary;
+		if (desc.length > 155) {
+			desc = desc.substring(0, 152) + '...';
+		}
+
+		document.getElementById('res_title').value = title;
+		document.getElementById('res_desc').value = desc;
+
+		updateTagPreviewsAndScores();
+
+		document.getElementById('generator_results').style.display = 'block';
+	});
+
+	function onTagInput() {
+		updateTagPreviewsAndScores();
+	}
+
+	function updateTagPreviewsAndScores() {
+		let title = document.getElementById('res_title').value;
+		let desc = document.getElementById('res_desc').value;
+		let keyword = document.getElementById('gen_keyword').value.trim().toLowerCase();
+
+		document.getElementById('preview_title').innerText = title || 'Page Title Preview';
+		document.getElementById('preview_desc').innerText = desc || 'Meta description preview will appear here...';
+
+		updateCounter('res_title', 'title_count', 50, 60);
+		updateCounter('res_desc', 'desc_count', 120, 155);
+
+		let score = calculateContentScore(title, desc);
+		updateChecklist(title, desc, keyword);
+	}
+
+	function updateChecklist(title, desc, keyword) {
+		let tLower = title.toLowerCase();
+		let dLower = desc.toLowerCase();
+		let kwLower = keyword.toLowerCase();
+
+		let hasKeyword = kwLower && tLower.includes(kwLower);
+		let tLenOpt = title.length >= 50 && title.length <= 60;
+		let dLenOpt = desc.length >= 120 && desc.length <= 155;
+		let hasCta = dLower.includes('discover') || dLower.includes('compare') || dLower.includes('learn') || dLower.includes('guide') || dLower.includes('find');
+
+		setChecklistStatus('chk_keyword', hasKeyword, hasKeyword ? 'Target keyword present in Title' : 'Target keyword missing in Title');
+		setChecklistStatus('chk_title_len', tLenOpt, tLenOpt ? 'Title length optimal (50–60 chars)' : 'Title length (' + title.length + ') needs 50–60 chars');
+		setChecklistStatus('chk_desc_len', dLenOpt, dLenOpt ? 'Description optimal (120–155 chars)' : 'Description length (' + desc.length + ') needs 120–155 chars');
+		setChecklistStatus('chk_cta', hasCta, hasCta ? 'Actionable CTA in Description' : 'Add action verb (Discover, Compare, Find)');
+	}
+
+	function setChecklistStatus(elementId, success, text) {
+		let el = document.getElementById(elementId);
+		if (success) {
+			el.innerHTML = '✔ ' + text;
+			el.style.color = '#15803d';
+		} else {
+			el.innerHTML = '❌ ' + text;
+			el.style.color = '#b91c1c';
+		}
+	}
+
+	function setSerpMode(mode) {
+		let container = document.getElementById('serp_container');
+		let btnD = document.getElementById('btn_desktop');
+		let btnM = document.getElementById('btn_mobile');
+		if (mode === 'mobile') {
+			container.style.maxWidth = '360px';
+			btnM.style.background = '#2563eb';
+			btnM.style.color = 'white';
+			btnD.style.background = 'transparent';
+			btnD.style.color = '#334155';
+		} else {
+			container.style.maxWidth = '600px';
+			btnD.style.background = '#2563eb';
+			btnD.style.color = 'white';
+			btnM.style.background = 'transparent';
+			btnM.style.color = '#334155';
+		}
+	}
+
+	function updateCounter(inputId, counterId, minOpt, maxOpt) {
+		let len = document.getElementById(inputId).value.length;
+		let badge = document.getElementById(counterId);
+		badge.innerText = len + ' chars';
+		if (len >= minOpt && len <= maxOpt) {
+			badge.style.background = '#dcfce7';
+			badge.style.color = '#15803d';
+		} else if (len > maxOpt) {
+			badge.style.background = '#fee2e2';
+			badge.style.color = '#b91c1c';
+		} else {
+			badge.style.background = '#fef3c7';
+			badge.style.color = '#b45309';
+		}
+	}
+
+	function calculateContentScore(title, desc) {
+		let tLen = title.length;
+		let dLen = desc.length;
+
+		let tScore = (tLen >= 50 && tLen <= 60) ? 50 : ((tLen >= 35 && tLen < 50) || (tLen > 60 && tLen <= 70) ? 30 : 15);
+		let dScore = (dLen >= 120 && dLen <= 155) ? 50 : ((dLen >= 90 && dLen < 120) || (dLen > 155 && dLen <= 175) ? 30 : 15);
+
+		let total = tScore + dScore;
+		window.lastContentScore = total;
+
+		let badge = document.getElementById('score_badge');
+		let label = document.getElementById('score_label');
+		let feedback = document.getElementById('score_feedback');
+
+		badge.innerText = total;
+
+		if (total >= 90) {
+			badge.style.background = '#16a34a';
+			label.innerText = 'Excellent SEO Score';
+		} else if (total >= 70) {
+			badge.style.background = '#2563eb';
+			label.innerText = 'Good SEO Score';
+		} else {
+			badge.style.background = '#d97706';
+			label.innerText = 'Needs Improvement';
+		}
+
+		let tMsg = (tLen >= 50 && tLen <= 60) ? 'Title length is optimal.' : 'Title length (' + tLen + ' chars) is outside the ideal 50-60 range.';
+		let dMsg = (dLen >= 120 && dLen <= 155) ? 'Meta description length is optimal.' : 'Description length (' + dLen + ' chars) is outside the ideal 120-155 range.';
+
+		feedback.innerHTML = tMsg + '<br>' + dMsg;
+		return total;
+	}
+
+	function copyText(elementId) {
+		let el = document.getElementById(elementId);
+		el.select();
+		navigator.clipboard.writeText(el.value);
+		alert('Copied to clipboard!');
+	}
+
+	function copySerpSnippet() {
+		let title = document.getElementById('res_title').value;
+		let desc = document.getElementById('res_desc').value;
+		let textToCopy = "Title: " + title + "\nDescription: " + desc;
+		navigator.clipboard.writeText(textToCopy);
+		alert('SERP snippet copied to clipboard!');
+	}
+
+	function exportMetaCSV() {
+		let title = document.getElementById('res_title').value;
+		let desc = document.getElementById('res_desc').value;
+		let score = window.lastContentScore || 0;
+
+		let csvContent = "data:text/csv;charset=utf-8,";
+		csvContent += "Metric,Value,Length,Status\r\n";
+		csvContent += "Meta Title,\"" + title.replace(/"/g, '""') + "\"," + title.length + "," + (title.length >= 50 && title.length <= 60 ? "Optimal" : "Review") + "\r\n";
+		csvContent += "Meta Description,\"" + desc.replace(/"/g, '""') + "\"," + desc.length + "," + (desc.length >= 120 && desc.length <= 155 ? "Optimal" : "Review") + "\r\n";
+		csvContent += "Content Score," + score + ",,\r\n";
+
+		let encodedUri = encodeURI(csvContent);
+		let link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("download", "seo_meta_tags_report.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+	// Bulk CSV Upload & Processing
+	function downloadCsvTemplate(e) {
+		e.preventDefault();
+		let csvContent = "data:text/csv;charset=utf-8,keyword,summary\r\ncloud hosting,High performance cloud servers with 99.9% uptime\r\nrunning shoes,Top cushioned running shoes for marathon training\r\nproject management software,Collaborative tools for remote teams";
+		let encodedUri = encodeURI(csvContent);
+		let link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("download", "bulk_keywords_template.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+	document.getElementById('process_bulk_btn').addEventListener('click', function() {
+		let fileInput = document.getElementById('bulk_csv_file');
+		if (fileInput.files.length === 0) {
+			alert('Please select a CSV file first.');
+			return;
+		}
+
+		let file = fileInput.files[0];
+		let reader = new FileReader();
+		reader.onload = function(e) {
+			let text = e.target.result;
+			let lines = text.split(/\r\n|\n/);
+			bulkGeneratedData = [];
+			let tbody = document.getElementById('bulk_table_body');
+			tbody.innerHTML = '';
+
+			for (let i = 1; i < lines.length; i++) {
+				let line = lines[i].trim();
+				if (!line) continue;
+				let parts = line.split(',');
+				let kw = parts[0] ? parts[0].replace(/^"|"$/g, '').trim() : '';
+				let summary = parts[1] ? parts[1].replace(/^"|"$/g, '').trim() : 'Professional guide and insights.';
+
+				if (!kw) continue;
+
+				let title = kw.charAt(0).toUpperCase() + kw.slice(1) + ' | Expert Guide (2026)';
+				let desc = 'Discover everything about ' + kw + '. ' + summary;
+				if (desc.length > 155) desc = desc.substring(0, 152) + '...';
+
+				let tScore = (title.length >= 50 && title.length <= 60) ? 50 : 30;
+				let dScore = (desc.length >= 120 && desc.length <= 155) ? 50 : 30;
+				let score = tScore + dScore;
+
+				bulkGeneratedData.push({ keyword: kw, title: title, description: desc, score: score });
+
+				let tr = document.createElement('tr');
+				tr.style.borderBottom = '1px solid #e5e7eb';
+				tr.innerHTML = `
+					<td style="padding:10px; font-weight:600;">${kw}</td>
+					<td style="padding:10px;">${title}</td>
+					<td style="padding:10px;">${desc}</td>
+					<td style="padding:10px;"><span style="background:${score >= 90 ? '#dcfce7' : '#fef3c7'}; color:${score >= 90 ? '#15803d' : '#b45309'}; padding:2px 6px; border-radius:4px; font-weight:600;">${score}/100</span></td>
+				`;
+				tbody.appendChild(tr);
+			}
+
+			document.getElementById('bulk_results_container').style.display = 'block';
+		};
+		reader.readAsText(file);
+	});
+
+	function exportBulkCSV() {
+		if (bulkGeneratedData.length === 0) {
+			alert('No bulk data to export.');
+			return;
+		}
+
+		let csvContent = "data:text/csv;charset=utf-8,";
+		csvContent += "Keyword,Generated Title Tag,Generated Meta Description,Content Score\r\n";
+		bulkGeneratedData.forEach(item => {
+			csvContent += "\"" + item.keyword + "\",\"" + item.title.replace(/"/g, '""') + "\",\"" + item.description.replace(/"/g, '""') + "\"," + item.score + "\r\n";
+		});
+
+		let encodedUri = encodeURI(csvContent);
+		let link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("download", "bulk_seo_meta_report.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+	// Keyword Research History & API fetch
+	const HISTORY_KEY = 'seonaut_kw_history';
+
+	function loadKeywordHistory() {
+		let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+		let section = document.getElementById('history_section');
+		let chipsContainer = document.getElementById('history_chips');
+		chipsContainer.innerHTML = '';
+
+		if (history.length === 0) {
+			section.style.display = 'none';
+			return;
+		}
+
+		section.style.display = 'block';
+		history.forEach(kw => {
+			let btn = document.createElement('button');
+			btn.type = 'button';
+			btn.innerText = kw;
+			btn.style.cssText = 'background:#e2e8f0; border:none; padding:4px 10px; border-radius:15px; font-size:12px; cursor:pointer; color:#334155;';
+			btn.onclick = function() {
+				document.getElementById('kw_query').value = kw;
+				fetchKeywordData(kw);
+			};
+			chipsContainer.appendChild(btn);
+		});
+	}
+
+	function saveKeywordHistory(kw) {
+		let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+		if (!history.includes(kw)) {
+			history.unshift(kw);
+			if (history.length > 8) history.pop();
+			localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+		}
+		loadKeywordHistory();
+	}
+
+	function clearKeywordHistory() {
+		localStorage.removeItem(HISTORY_KEY);
+		loadKeywordHistory();
+	}
+
+	function renderCompetitionChart(data) {
+		let chartDom = document.getElementById('competition_chart');
+		if (competitionChartInstance) {
+			competitionChartInstance.dispose();
+		}
+		competitionChartInstance = echarts.init(chartDom);
+
+		let keywords = data.map(item => item.keyword);
+		let volumes = data.map(item => item.volume);
+		let competitions = data.map(item => Math.round(item.competition * 100));
+
+		let option = {
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: { type: 'shadow' }
+			},
+			legend: {
+				data: ['Search Volume', 'Competition (%)']
+			},
+			grid: {
+				left: '3%',
+				right: '4%',
+				bottom: '3%',
+				containLabel: true
+			},
+			xAxis: {
+				type: 'category',
+				data: keywords,
+				axisLabel: { interval: 0, rotate: 25 }
+			},
+			yAxis: [
+				{
+					type: 'value',
+					name: 'Volume',
+					position: 'left'
+				},
+				{
+					type: 'value',
+					name: 'Competition %',
+					max: 100,
+					position: 'right'
+				}
+			],
+			series: [
+				{
+					name: 'Search Volume',
+					type: 'bar',
+					data: volumes,
+					itemStyle: { color: '#2563eb' }
+				},
+				{
+					name: 'Competition (%)',
+					type: 'line',
+					yAxisIndex: 1,
+					data: competitions,
+					itemStyle: { color: '#dc2626' },
+					lineStyle: { width: 3 }
+				}
+			]
+		};
+
+		competitionChartInstance.setOption(option);
+	}
+
+	function renderTrendChart(query, baseVolume) {
+		let chartDom = document.getElementById('trend_chart');
+		if (trendChartInstance) {
+			trendChartInstance.dispose();
+		}
+		trendChartInstance = echarts.init(chartDom);
+
+		document.getElementById('trend_chart_title').innerText = '12-Month Search Volume Trend: "' + query + '"';
+
+		let months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+		let trendData = months.map((m, idx) => {
+			let multiplier = 0.8 + Math.sin(idx * 0.5) * 0.25 + (idx * 0.01);
+			return Math.round(baseVolume * multiplier);
+		});
+
+		let option = {
+			tooltip: {
+				trigger: 'axis'
+			},
+			grid: {
+				left: '3%',
+				right: '4%',
+				bottom: '3%',
+				containLabel: true
+			},
+			xAxis: {
+				type: 'category',
+				data: months
+			},
+			yAxis: {
+				type: 'value',
+				name: 'Monthly Searches'
+			},
+			series: [
+				{
+					name: 'Search Volume',
+					type: 'line',
+					data: trendData,
+					smooth: true,
+					itemStyle: { color: '#16a34a' },
+					areaStyle: {
+						color: {
+							type: 'linear',
+							x: 0, y: 0, x2: 0, y2: 1,
+							colorStops: [
+								{ offset: 0, color: 'rgba(22, 163, 74, 0.4)' },
+								{ offset: 1, color: 'rgba(22, 163, 74, 0.0)' }
+							]
+						}
+					},
+					lineStyle: { width: 3 }
+				}
+			]
+		};
+
+		trendChartInstance.setOption(option);
+	}
+
+	function fetchKeywordData(query) {
+		document.getElementById('kw_loading').style.display = 'block';
+		document.getElementById('kw_results_container').style.display = 'none';
+
+		saveKeywordHistory(query);
+
+		fetch('/api/keywords?q=' + encodeURIComponent(query))
+			.then(response => response.json())
+			.then(data => {
+				document.getElementById('kw_loading').style.display = 'none';
+				let tbody = document.getElementById('kw_table_body');
+				tbody.innerHTML = '';
+
+				data.forEach(item => {
+					let tr = document.createElement('tr');
+					tr.style.borderBottom = '1px solid #e5e7eb';
+					
+					let diffColor = item.difficulty === 'Hard' ? '#ef4444' : (item.difficulty === 'Medium' ? '#f59e0b' : '#10b981');
+					let scoreColor = item.difficulty_score >= 70 ? '#ef4444' : (item.difficulty_score >= 40 ? '#f59e0b' : '#10b981');
+
+					tr.innerHTML = `
+						<td style="padding:12px; font-weight:600; color:#1f2937;">${item.keyword}</td>
+						<td style="padding:12px;">${item.volume.toLocaleString()}</td>
+						<td style="padding:12px;">$${item.cpc.toFixed(2)}</td>
+						<td style="padding:12px;">
+							<div style="background:#e2e8f0; border-radius:4px; width:100px; height:8px; overflow:hidden;">
+								<div style="background:${item.competition > 0.55 ? '#ef4444' : '#16a34a'}; width:${Math.round(item.competition*100)}%; height:100%;"></div>
+							</div>
+							<span style="font-size:11px; color:#64748b;">${(item.competition * 100).toFixed(0)}%</span>
+						</td>
+						<td style="padding:12px;"><span style="background:${diffColor}22; color:${diffColor}; padding:4px 8px; border-radius:4px; font-weight:600;">${item.difficulty}</span></td>
+						<td style="padding:12px;"><span style="background:${scoreColor}22; color:${scoreColor}; padding:4px 10px; border-radius:6px; font-weight:700;">${item.difficulty_score} / 100</span></td>
+					`;
+					tbody.appendChild(tr);
+				});
+
+				document.getElementById('kw_results_container').style.display = 'block';
+				renderCompetitionChart(data);
+				if (data.length > 0) {
+					renderTrendChart(data[0].keyword, data[0].volume);
+				}
+			})
+			.catch(err => {
+				document.getElementById('kw_loading').style.display = 'none';
+				alert('Failed to fetch keyword data. Please try again.');
+			});
+	}
+
+	// Long-Tail Suggestions API fetch
+	document.getElementById('long_tail_btn').addEventListener('click', function() {
+		let query = document.getElementById('kw_query').value.trim();
+		if (!query) {
+			alert('Please enter a seed keyword first.');
+			return;
+		}
+
+		fetch('/api/long-tail?q=' + encodeURIComponent(query))
+			.then(response => response.json())
+			.then(data => {
+				let container = document.getElementById('long_tail_container');
+				let chips = document.getElementById('long_tail_chips');
+				chips.innerHTML = '';
+
+				data.forEach(kw => {
+					let btn = document.createElement('button');
+					btn.type = 'button';
+					btn.innerText = kw;
+					btn.style.cssText = 'background:#e0f2fe; border:1px solid #7dd3fc; color:#0369a1; padding:4px 10px; border-radius:15px; font-size:12px; cursor:pointer; font-weight:600;';
+					btn.onclick = function() {
+						document.getElementById('kw_query').value = kw;
+						fetchKeywordData(kw);
+					};
+					chips.appendChild(btn);
+				});
+
+				container.style.display = 'block';
+			})
+			.catch(err => {
+				alert('Failed to fetch long-tail suggestions.');
+			});
+	});
+
+	document.getElementById('search_kw_btn').addEventListener('click', function() {
+		let query = document.getElementById('kw_query').value.trim();
+		if (!query) {
+			alert('Please enter a seed keyword.');
+			return;
+		}
+		fetchKeywordData(query);
+	});
+
+	// Load history on page load
+	loadKeywordHistory();
+</script>
+
+{{ template "footer" . }}
