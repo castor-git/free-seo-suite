@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"net/mail"
+	"strings"
 
 	"github.com/stjudewashere/seonaut/internal/models"
 
@@ -88,7 +89,15 @@ func (s *UserService) SignUp(email, password, lang, theme string) (*models.User,
 
 	theme = s.getValidatedTheme(theme)
 
-	return s.repository.UserSignup(email, string(hashedPassword), lang, theme)
+	u, err := s.repository.UserSignup(email, string(hashedPassword), lang, theme)
+	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") || strings.Contains(err.Error(), "1062") {
+			return nil, ErrUserExists
+		}
+		return nil, err
+	}
+
+	return u, nil
 }
 
 // SignIn validates the provided email and password combination for user authentication.

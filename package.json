@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "SEO Crawler and Website Auditor",
   "scripts": {
-    "build": "make front",
-    "start": "./seonaut -c config"
+    "build": "make front && (which go >/dev/null 2>&1 && CGO_ENABLED=0 go build -ldflags=\"-s -w\" -o seonaut cmd/server/main.go || true)",
+    "lint": "go vet ./...",
+    "start": "./start.sh"
   },
   "dependencies": {}
 }

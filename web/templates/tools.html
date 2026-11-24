@@ -1,222 +1,1535 @@
 {{ template "head" . }}
 <script src="/resources/echarts.min.js"></script>
 
+<style>
+/* Responsive Sidebar-Main Layout Styles */
+.tools-workspace-container {
+	max-width: 1440px;
+	margin: 0 auto;
+	padding: 10px 15px 40px 15px;
+}
+
+/* Header Banner */
+.tools-hero-banner {
+	background: var(--secondary-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 12px;
+	padding: 24px 28px;
+	margin-bottom: 24px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+.tools-hero-text h2 {
+	margin: 0 0 6px 0;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+.tools-hero-text p {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--primary-light-color);
+	max-width: 750px;
+}
+.tools-hero-stats {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+.hero-stat-pill {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	padding: 6px 14px;
+	border-radius: 20px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--primary-color);
+}
+.hero-stat-pill .pill-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #10b981;
+}
+
+/* Mobile Toggle Button for Sidebar */
+.mobile-sidebar-toggle-bar {
+	display: none;
+	margin-bottom: 16px;
+}
+.btn-sidebar-toggle {
+	width: 100%;
+	padding: 12px 18px;
+	background: var(--secondary-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--primary-color);
+}
+.toggle-badge {
+	background: #dbeafe;
+	color: #1e40af;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 0.8rem;
+}
+
+/* Main Grid Shell */
+.seo-layout-grid {
+	display: grid;
+	grid-template-columns: 320px minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+}
+
+/* Sidebar Column */
+.seo-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+@media (min-width: 992px) {
+	.seo-sidebar {
+		position: sticky;
+		top: 20px;
+		max-height: calc(100vh - 40px);
+		overflow-y: auto;
+		padding-right: 4px;
+	}
+	.seo-sidebar::-webkit-scrollbar {
+		width: 5px;
+	}
+	.seo-sidebar::-webkit-scrollbar-thumb {
+		background: #cbd5e1;
+		border-radius: 4px;
+	}
+}
+
+/* Sidebar Cards */
+.sidebar-card {
+	background: var(--secondary-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 10px;
+	padding: 18px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.sidebar-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+.sidebar-card-title {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.sidebar-subtext {
+	font-size: 0.8rem;
+	color: var(--primary-light-color);
+	margin: 0 0 12px 0;
+	line-height: 1.35;
+}
+
+/* Navigation / View Switcher */
+.sidebar-nav-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.nav-tab-btn {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--primary-color);
+	font-size: 0.88rem;
+	font-weight: 600;
+	cursor: pointer;
+	text-align: left;
+	transition: all 0.2s ease;
+	width: 100%;
+}
+.nav-tab-btn:hover {
+	background: var(--highlight-color);
+}
+.nav-tab-btn.active {
+	background: var(--highlight-color);
+	border-color: rgba(37,99,235,0.25);
+	color: #2563eb;
+}
+.dark .nav-tab-btn.active {
+	color: #60a5fa;
+}
+
+/* SEO Best Practices Checklist */
+.checklist-progress-wrap {
+	margin-bottom: 14px;
+}
+.chk-progress-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--primary-color);
+}
+.chk-progress-track {
+	width: 100%;
+	height: 8px;
+	background: #e2e8f0;
+	border-radius: 4px;
+	overflow: hidden;
+}
+.chk-progress-fill {
+	height: 100%;
+	width: 33%;
+	background: #10b981;
+	transition: width 0.3s ease, background-color 0.3s ease;
+}
+.checklist-ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.checklist-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 8px 10px;
+	border-radius: 6px;
+	font-size: 0.82rem;
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	cursor: help;
+	transition: background-color 0.2s ease;
+	position: relative;
+}
+.checklist-item:hover {
+	border-color: #94a3b8;
+}
+.checklist-item-content {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+}
+.chk-icon {
+	font-size: 1rem;
+	line-height: 1;
+}
+.chk-info-icon {
+	font-size: 0.75rem;
+	color: #94a3b8;
+}
+
+/* Sidebar Live Score Widget */
+.sidebar-score-row {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 10px;
+	background: var(--main-bg-color);
+	border-radius: 8px;
+	border: 1px solid var(--dark-opacity-color);
+}
+.sidebar-score-circle {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: #2563eb;
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+.sidebar-score-details {
+	flex: 1;
+}
+.sidebar-score-title {
+	font-size: 0.88rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	margin-bottom: 2px;
+}
+.sidebar-score-sub {
+	font-size: 0.75rem;
+	color: var(--primary-light-color);
+	line-height: 1.25;
+}
+
+/* History Chips */
+.history-chips-box {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	min-height: 28px;
+}
+.history-chip-btn {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	color: var(--primary-color);
+	padding: 4px 10px;
+	border-radius: 12px;
+	font-size: 0.78rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+.history-chip-btn:hover {
+	background: var(--highlight-color);
+	border-color: #2563eb;
+}
+.btn-clear-history {
+	background: none;
+	border: none;
+	color: #ef4444;
+	font-size: 0.75rem;
+	cursor: pointer;
+	text-decoration: underline;
+	padding: 0;
+}
+
+/* Pro Tips */
+.pro-tips-ul {
+	list-style: disc;
+	padding-left: 18px;
+	margin: 0;
+	font-size: 0.8rem;
+	color: var(--primary-light-color);
+	line-height: 1.5;
+}
+.pro-tips-ul li {
+	margin-bottom: 6px;
+}
+.pro-tips-ul strong {
+	color: var(--primary-color);
+}
+
+/* MAIN CONTENT AREA */
+.seo-main {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* Tool Section Cards */
+.tool-section-card {
+	background: var(--secondary-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 12px;
+	padding: 24px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.tool-section-header {
+	margin-bottom: 20px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid var(--dark-opacity-color);
+}
+.tool-section-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.tool-section-title h3 {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+.tool-section-header p {
+	margin: 4px 0 0 0;
+	font-size: 0.88rem;
+	color: var(--primary-light-color);
+}
+
+/* Sample Pills */
+.sample-pills-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+	font-size: 0.82rem;
+}
+.sample-pill-btn {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	color: var(--primary-color);
+	padding: 4px 10px;
+	border-radius: 14px;
+	cursor: pointer;
+	font-size: 0.8rem;
+	transition: all 0.2s;
+}
+.sample-pill-btn:hover {
+	background: #e0e7ff;
+	color: #1e40af;
+	border-color: #93c5fd;
+}
+
+/* Form Controls */
+.form-group {
+	margin-bottom: 16px;
+}
+.form-label {
+	display: block;
+	font-size: 0.88rem;
+	font-weight: 600;
+	color: var(--primary-color);
+	margin-bottom: 6px;
+}
+.form-input, .form-textarea {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 10px 14px;
+	border-radius: 8px;
+	border: 1px solid var(--dark-opacity-color);
+	background: var(--main-bg-color);
+	color: var(--primary-color);
+	font-family: inherit;
+	font-size: 0.95rem;
+	transition: border-color 0.2s ease;
+}
+.form-input:focus, .form-textarea:focus {
+	outline: none;
+	border-color: #2563eb;
+	box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+.field-hint {
+	display: block;
+	font-size: 0.78rem;
+	color: var(--primary-light-color);
+	margin-top: 4px;
+}
+
+/* Buttons */
+.btn-primary {
+	background: #2563eb;
+	color: #ffffff;
+	border: none;
+	padding: 11px 22px;
+	border-radius: 8px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	transition: background-color 0.2s ease;
+}
+.btn-primary:hover {
+	background: #1d4ed8;
+}
+.btn-secondary {
+	background: #0284c7;
+	color: #ffffff;
+	border: none;
+	padding: 9px 18px;
+	border-radius: 6px;
+	font-size: 0.88rem;
+	font-weight: 600;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.btn-secondary:hover {
+	background: #0369a1;
+}
+.btn-success {
+	background: #16a34a;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 8px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.btn-success:hover {
+	background: #15803d;
+}
+.btn-info {
+	background: #0ea5e9;
+	color: #ffffff;
+	border: none;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.btn-info:hover {
+	background: #0284c7;
+}
+.btn-purple {
+	background: #7c3aed;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 8px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.btn-purple:hover {
+	background: #6d28d9;
+}
+.btn-copy {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	color: var(--primary-color);
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 0.82rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+}
+.btn-copy:hover {
+	background: #e2e8f0;
+}
+.counter-badge {
+	font-size: 0.78rem;
+	font-weight: 700;
+	padding: 4px 8px;
+	border-radius: 6px;
+	background: #f1f5f9;
+	color: #475569;
+}
+
+/* Score Card Banner */
+.score-card-banner {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 10px;
+	padding: 18px 22px;
+	margin: 20px 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+.score-card-left h4 {
+	margin: 0 0 4px 0;
+	font-size: 1.05rem;
+	color: var(--primary-color);
+}
+.score-card-left p {
+	margin: 0;
+	font-size: 0.82rem;
+	color: var(--primary-light-color);
+}
+.score-card-right {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+.score-circle {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background: #2563eb;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.6rem;
+	font-weight: 800;
+	flex-shrink: 0;
+}
+.score-label {
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	margin-bottom: 2px;
+}
+.score-feedback {
+	font-size: 0.78rem;
+	color: var(--primary-light-color);
+	max-width: 300px;
+	line-height: 1.35;
+}
+
+/* Tag Field Group */
+.tag-field-group {
+	margin-bottom: 18px;
+}
+.tag-field-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+.tag-field-header label {
+	font-size: 0.88rem;
+	font-weight: 600;
+	color: var(--primary-color);
+}
+.tag-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* SERP Simulator */
+.serp-simulator-wrapper {
+	margin-top: 26px;
+	padding-top: 20px;
+	border-top: 1px solid var(--dark-opacity-color);
+}
+.serp-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+.serp-title-wrap h4 {
+	margin: 0 0 4px 0;
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+.serp-title-wrap p {
+	margin: 0;
+	font-size: 0.82rem;
+	color: var(--primary-light-color);
+}
+.serp-controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+.serp-toggle-group {
+	display: inline-flex;
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 6px;
+	padding: 2px;
+}
+.serp-toggle-btn {
+	border: none;
+	background: transparent;
+	color: var(--primary-color);
+	padding: 5px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.8rem;
+	font-weight: 600;
+	transition: all 0.2s;
+}
+.serp-toggle-btn.active {
+	background: #2563eb;
+	color: #ffffff;
+}
+.serp-stage {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 12px;
+	padding: 24px;
+	display: flex;
+	justify-content: center;
+}
+.serp-card {
+	background: #ffffff;
+	color: #202124;
+	border: 1px solid #dfe1e5;
+	border-radius: 12px;
+	padding: 18px 22px;
+	width: 100%;
+	max-width: 620px;
+	font-family: Arial, sans-serif;
+	box-shadow: 0 1px 6px rgba(32,33,36,0.1);
+	transition: max-width 0.3s ease;
+}
+.serp-url-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 6px;
+}
+.serp-favicon {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: #f1f3f4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: bold;
+	color: #5f6368;
+}
+.serp-site-name {
+	font-size: 13px;
+	color: #202124;
+	font-weight: 500;
+	display: block;
+	line-height: 1.2;
+}
+.serp-url-slug {
+	font-size: 11px;
+	color: #5f6368;
+	display: block;
+	line-height: 1.2;
+}
+.serp-title {
+	font-size: 20px;
+	color: #1a0dab;
+	line-height: 1.3;
+	cursor: pointer;
+	margin-bottom: 4px;
+	font-weight: 400;
+	word-break: break-word;
+}
+.serp-title:hover {
+	text-decoration: underline;
+}
+.serp-desc {
+	font-size: 14px;
+	color: #4d5156;
+	line-height: 1.5;
+	word-break: break-word;
+}
+
+/* Keyword Search Bar */
+.kw-search-bar {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+.kw-input {
+	flex: 1;
+	min-width: 260px;
+}
+
+/* Long-Tail Box */
+.long-tail-box {
+	background: #f0f9ff;
+	border: 1px solid #bae6fd;
+	border-radius: 8px;
+	padding: 14px;
+	margin-bottom: 16px;
+}
+.dark .long-tail-box {
+	background: #1e293b;
+	border-color: #38bdf8;
+}
+.long-tail-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+}
+.long-tail-header h4 {
+	margin: 0;
+	font-size: 0.9rem;
+	color: #0369a1;
+}
+.dark .long-tail-header h4 {
+	color: #38bdf8;
+}
+.badge-tip {
+	font-size: 0.75rem;
+	color: #0284c7;
+	font-style: italic;
+}
+.chips-flex {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* Charts Grid */
+.charts-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 18px;
+	margin: 20px 0;
+}
+@media (max-width: 900px) {
+	.charts-grid {
+		grid-template-columns: 1fr;
+	}
+}
+.chart-card {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 10px;
+	padding: 16px;
+}
+.chart-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.chart-card-header h4 {
+	margin: 0;
+	font-size: 0.92rem;
+	color: var(--primary-color);
+}
+.chart-legend-hint {
+	font-size: 0.75rem;
+	color: var(--primary-light-color);
+}
+.echart-container {
+	width: 100%;
+	height: 290px;
+}
+
+/* Table Cards */
+.table-card {
+	margin-top: 20px;
+}
+.table-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.table-card-header h4 {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--primary-color);
+}
+.table-sub {
+	font-size: 0.78rem;
+	color: var(--primary-light-color);
+}
+.responsive-table-wrapper {
+	overflow-x: auto;
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 8px;
+}
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.88rem;
+	text-align: left;
+}
+.data-table thead tr {
+	background: var(--main-bg-color);
+	border-bottom: 2px solid var(--dark-opacity-color);
+}
+.data-table th, .data-table td {
+	padding: 10px 14px;
+}
+.data-table tbody tr {
+	border-bottom: 1px solid var(--dark-opacity-color);
+}
+.data-table tbody tr:last-child {
+	border-bottom: none;
+}
+
+/* Bulk Upload Bar */
+.bulk-upload-bar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+.file-input {
+	padding: 8px;
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 6px;
+	color: var(--primary-color);
+	font-size: 0.85rem;
+}
+.template-link {
+	font-size: 0.85rem;
+	color: #2563eb;
+	text-decoration: underline;
+	cursor: pointer;
+}
+.bulk-results-box {
+	margin-top: 16px;
+}
+.bulk-results-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.bulk-results-header h4 {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--primary-color);
+}
+
+/* Loading State */
+.loading-state {
+	padding: 20px;
+	text-align: center;
+	color: var(--primary-light-color);
+	font-style: italic;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+.spinner {
+	width: 18px;
+	height: 18px;
+	border: 2px solid #cbd5e1;
+	border-top-color: #2563eb;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+/* Audit Results Styles */
+.audit-metric-card {
+	background: var(--main-bg-color);
+	border: 1px solid var(--dark-opacity-color);
+	border-radius: 8px;
+	padding: 14px;
+	margin-bottom: 12px;
+}
+.audit-metric-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+.audit-metric-title {
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+.h1-chip-item {
+	display: inline-block;
+	background: var(--secondary-color);
+	border: 1px solid #93c5fd;
+	color: #1d4ed8;
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	margin-right: 6px;
+	margin-top: 4px;
+	word-break: break-word;
+}
+.dark .h1-chip-item {
+	background: #1e293b;
+	color: #93c5fd;
+	border-color: #3b82f6;
+}
+
+/* Responsiveness Breakpoints */
+@media (max-width: 991px) {
+	.seo-layout-grid {
+		grid-template-columns: 1fr;
+	}
+	.mobile-sidebar-toggle-bar {
+		display: block;
+	}
+	.seo-sidebar {
+		display: none; /* Controlled by mobile toggle */
+	}
+	.seo-sidebar.mobile-open {
+		display: flex;
+	}
+}
+</style>
+
 <div class="panel">
-	<div class="box box-first box-highlight">
-		<div class="col col-main">
-			<div class="content content-centered">
-				<div>
-					<h2>SEO Assistant & Optimizer Tools</h2>
-					<p>Generate optimized title tags, meta descriptions, content scores, checklist tooltips, long-tail keyword suggestions, and ECharts visualizations.</p>
-				</div>
+	<div class="tools-workspace-container">
+		
+		<!-- Hero Banner -->
+		<div class="tools-hero-banner">
+			<div class="tools-hero-text">
+				<h2>SEO Studio & Intelligence Suite</h2>
+				<p>Comprehensive workspace integrating live URL scraping, on-page SEO audits, keyword research, meta tag generator with Google SERP simulator, and dynamic best-practices checklist.</p>
 			</div>
-		</div>
-	</div>
-
-	<!-- Main Grid Layout: Generator & SEO Checklist Sidebar -->
-	<div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; align-items:start;" id="tools_grid">
-
-		<!-- Left Column: Generator & SERP Simulator -->
-		<div>
-			<div class="box" style="margin-top:0;">
-				<div class="col col-main">
-					<div class="content">
-						<h3>Title Tag & Meta Description Generator & SERP Simulator</h3>
-						<p>Enter your target topic or primary keyword and content summary to generate tags and preview them in a simulated Google SERP.</p>
-						
-						<div style="margin-top: 15px;">
-							<label for="gen_keyword">Primary Keyword / Topic</label>
-							<input type="text" id="gen_keyword" placeholder="e.g. Best Coffee Maker 2026" style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;">
-
-							<label for="gen_summary">Content Summary / Selling Points</label>
-							<textarea id="gen_summary" rows="3" placeholder="e.g. Compare top-rated espresso machines, user reviews, pricing, and buying guide." style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;"></textarea>
-
-							<button type="button" id="generate_btn" style="background:#2563eb; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Generate Optimized Tags & SERP Preview</button>
-						</div>
-
-						<div id="generator_results" style="margin-top: 25px; display: none;">
-							<hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-							
-							<!-- Content Score Preview Component -->
-							<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:25px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
-								<div>
-									<h4 style="margin:0 0 5px 0; color:#1e293b;">SEO Content Score</h4>
-									<p style="margin:0; font-size:13px; color:#64748b;">Evaluated based on title & meta description optimal lengths.</p>
-								</div>
-								<div style="display:flex; align-items:center; gap:15px;">
-									<div id="score_badge" style="width:70px; height:70px; border-radius:50%; background:#2563eb; color:white; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold;">0</div>
-									<div>
-										<div id="score_label" style="font-weight:700; font-size:16px; color:#0f172a;">Pending</div>
-										<div id="score_feedback" style="font-size:12px; color:#475569; max-width:280px;">Generate tags to calculate content score.</div>
-									</div>
-								</div>
-							</div>
-
-							<h4>Generated Title Tag (Editable)</h4>
-							<div style="display:flex; align-items:center; gap:10px; margin-top:5px; margin-bottom:15px;">
-								<input type="text" id="res_title" oninput="onTagInput()" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ccc; background:#fff;">
-								<span id="title_count" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:4px;">0 chars</span>
-								<button type="button" onclick="copyText('res_title')" style="padding:10px 15px; cursor:pointer;">Copy Title</button>
-							</div>
-
-							<h4>Generated Meta Description (Editable)</h4>
-							<div style="display:flex; align-items:center; gap:10px; margin-top:5px; margin-bottom:15px;">
-								<input type="text" id="res_desc" oninput="onTagInput()" style="flex:1; padding:10px; border-radius:6px; border:1px solid #ccc; background:#fff;">
-								<span id="desc_count" style="font-size:12px; font-weight:600; padding:4px 8px; border-radius:4px;">0 chars</span>
-								<button type="button" onclick="copyText('res_desc')" style="padding:10px 15px; cursor:pointer;">Copy Desc</button>
-							</div>
-
-							<div style="margin-top: 15px; margin-bottom: 25px;">
-								<button type="button" onclick="exportMetaCSV()" style="background:#0284c7; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">📥 Export Meta Tags & Score to CSV</button>
-							</div>
-
-							<!-- Visual Google SERP Simulator Component -->
-							<h4 style="margin-top:20px; display:flex; align-items:center; justify-content:space-between;">
-								<span>Google Search Result Page (SERP) Simulator</span>
-								<span style="font-size:12px; font-weight:normal; background:#e2e8f0; padding:4px 8px; border-radius:4px;">
-									<button type="button" onclick="setSerpMode('desktop')" id="btn_desktop" style="border:none; background:#2563eb; color:white; padding:2px 8px; border-radius:3px; cursor:pointer; font-size:11px;">Desktop View</button>
-									<button type="button" onclick="setSerpMode('mobile')" id="btn_mobile" style="border:none; background:transparent; color:#334155; padding:2px 8px; border-radius:3px; cursor:pointer; font-size:11px;">Mobile View</button>
-								</span>
-							</h4>
-							<div id="serp_container" style="border:1px solid #dfe1e5; border-radius:12px; padding:20px; background:#fff; max-width:600px; font-family:Arial,sans-serif; box-shadow:0 1px 6px rgba(32,33,36,.1); transition: all 0.3s ease; position:relative;">
-								<button type="button" onclick="copySerpSnippet()" style="position:absolute; top:15px; right:15px; background:#f1f3f4; border:1px solid #dadce0; border-radius:4px; padding:4px 10px; font-size:11px; cursor:pointer; font-weight:600; color:#3c4043;">📋 Copy Snippet</button>
-								<div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-									<div style="width:26px; height:26px; border-radius:50%; background:#f1f3f4; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:#5f6368;">S</div>
-									<div>
-										<div style="font-size:12px; color:#202124; line-height:1.2; font-weight:500;">SEOnaut Site Auditor</div>
-										<div style="font-size:11px; color:#5f6368; line-height:1.2;">https://example.com › seo-tool-page</div>
-									</div>
-								</div>
-								<div id="preview_title" style="font-size:20px; color:#1a0dab; line-height:1.3; cursor:pointer; margin-bottom:4px; font-weight:400;">Page Title Preview</div>
-								<div id="preview_desc" style="font-size:14px; color:#4d5156; line-height:1.5;">Meta description preview will appear here...</div>
-							</div>
-						</div>
-					</div>
+			<div class="tools-hero-stats">
+				<div class="hero-stat-pill">
+					<span class="pill-dot"></span>
+					<span>Status: Ready</span>
+				</div>
+				<div class="hero-stat-pill">
+					<span>🎯 Score:</span>
+					<strong id="top_score_badge">0/100</strong>
+				</div>
+				<div class="hero-stat-pill">
+					<span>📋 Checklist:</span>
+					<strong id="top_chk_badge">2/6 Passed</strong>
 				</div>
 			</div>
 		</div>
 
-		<!-- Right Column: SEO Best Practices Checklist Sidebar with Hover Tooltips -->
-		<div>
-			<div class="box" style="margin-top:0; background:#f8fafc; border:1px solid #e2e8f0;">
-				<div class="col col-main">
-					<div class="content">
-						<h3 style="font-size:16px; margin-top:0; color:#0f172a;">SEO Best Practices Checklist</h3>
-						<p style="font-size:13px; color:#64748b;">Hover over items for details on why they matter.</p>
-						
-						<ul id="checklist_ul" style="list-style:none; padding:0; margin:15px 0 0 0; font-size:13px;">
-							<li id="chk_keyword" title="Including the primary keyword in your title tag helps search engines and users instantly recognize relevance." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Target keyword present in Title</li>
-							<li id="chk_title_len" title="Keeping title tags between 50-60 characters prevents truncation in Google search result pages." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Title length optimal (50–60 chars)</li>
-							<li id="chk_desc_len" title="Meta descriptions between 120-155 characters provide a complete pitch without getting cut off." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Description optimal (120–155 chars)</li>
-							<li id="chk_cta" title="Actionable verbs like Discover, Compare, or Learn improve click-through rates (CTR) in search results." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#64748b; cursor:help;">❌ Actionable CTA in Description</li>
-							<li id="chk_alt" title="Alt text improves accessibility and helps image search indexing." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#15803d; cursor:help;">✔ Images have alt text verified</li>
-							<li id="chk_url" title="Clean, descriptive URLs improve user trust and click-through rates." style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#15803d; cursor:help;">✔ Clean slug & URL structure</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+		<!-- Mobile Sidebar Toggle -->
+		<div class="mobile-sidebar-toggle-bar">
+			<button type="button" id="mobile_sidebar_toggle" class="btn-sidebar-toggle" onclick="toggleMobileSidebar()" aria-expanded="false" aria-controls="seo_sidebar">
+				<span style="display:flex; align-items:center; gap:8px;">
+					<span id="mobile_toggle_icon">☰</span>
+					<span>SEO Best Practices & Tools Menu</span>
+				</span>
+				<span class="toggle-badge" id="mobile_chk_badge">2 / 6 Passed</span>
+			</button>
 		</div>
 
-	</div>
+		<!-- Responsive Sidebar-Main Layout -->
+		<div class="seo-layout-grid" id="seo_layout_root">
 
-	<!-- Tool 3: Bulk CSV Keyword Generator -->
-	<div class="box">
-		<div class="col col-main">
-			<div class="content">
-				<h3>Bulk CSV Meta Tag Generator</h3>
-				<p>Upload a CSV file containing multiple target keywords (format: <code>keyword,summary</code>) to generate meta tags for all of them in bulk.</p>
+			<!-- SIDEBAR COMPONENT -->
+			<aside class="seo-sidebar" id="seo_sidebar">
 				
-				<div style="display:flex; gap:10px; align-items:center; margin-top:15px; margin-bottom:20px; flex-wrap:wrap;">
-					<input type="file" id="bulk_csv_file" accept=".csv" style="padding:8px; border:1px solid #ccc; border-radius:6px; background:#fff;">
-					<button type="button" id="process_bulk_btn" style="background:#7c3aed; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Process Bulk CSV</button>
-					<a href="#" onclick="downloadCsvTemplate(event)" style="font-size:13px; color:#2563eb; text-decoration:underline;">Download CSV Template</a>
+				<!-- Card 1: Tool Navigation / Active View Switcher -->
+				<div class="sidebar-card">
+					<div class="sidebar-card-header">
+						<h4 class="sidebar-card-title"><span>⚡</span> Quick Navigation</h4>
+					</div>
+					<nav class="sidebar-nav-list" aria-label="SEO Tools Switcher">
+						<button type="button" class="nav-tab-btn active" data-target="all" onclick="switchToolView('all')">
+							<span>📊</span>
+							<span>All Tools Workspace</span>
+						</button>
+						<button type="button" class="nav-tab-btn" data-target="audit" onclick="switchToolView('audit')">
+							<span>🌐</span>
+							<span>URL Audit & Scraper</span>
+						</button>
+						<button type="button" class="nav-tab-btn" data-target="meta" onclick="switchToolView('meta')">
+							<span>🏷️</span>
+							<span>Meta Generator & SERP</span>
+						</button>
+						<button type="button" class="nav-tab-btn" data-target="keywords" onclick="switchToolView('keywords')">
+							<span>🔍</span>
+							<span>Keyword Research</span>
+						</button>
+						<button type="button" class="nav-tab-btn" data-target="bulk" onclick="switchToolView('bulk')">
+							<span>📁</span>
+							<span>Bulk CSV Generator</span>
+						</button>
+					</nav>
 				</div>
 
-				<div id="bulk_results_container" style="display:none; overflow-x:auto; margin-top:15px;">
-					<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-						<h4 style="margin:0;">Bulk Generation Results</h4>
-						<button type="button" onclick="exportBulkCSV()" style="background:#0284c7; color:white; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600;">📥 Download Bulk CSV Report</button>
+				<!-- Card 2: SEO Best Practices Live Checklist (Hoverable Tooltips & Dynamic Progress Meter) -->
+				<div class="sidebar-card" id="checklist_sidebar_card">
+					<div class="sidebar-card-header">
+						<h4 class="sidebar-card-title"><span>📋</span> SEO Best Practices</h4>
+						<span id="chk_passed_pill" style="background:#dcfce7; color:#15803d; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:10px;">2 / 6</span>
 					</div>
-					<table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
-						<thead>
-							<tr style="background:#f3f4f6; border-bottom:2px solid #e5e7eb;">
-								<th style="padding:10px;">Keyword</th>
-								<th style="padding:10px;">Generated Title Tag</th>
-								<th style="padding:10px;">Generated Meta Description</th>
-								<th style="padding:10px;">Score</th>
-							</tr>
-						</thead>
-						<tbody id="bulk_table_body">
-						</tbody>
-					</table>
+					<p class="sidebar-subtext">Live audit of your meta tags and page signals. Hover items to see why they matter.</p>
+
+					<!-- Animated Progress Meter -->
+					<div class="checklist-progress-wrap">
+						<div class="chk-progress-header">
+							<span>Audit Progress</span>
+							<span id="chk_progress_pct">33%</span>
+						</div>
+						<div class="chk-progress-track">
+							<div class="chk-progress-fill" id="chk_progress_fill" style="width: 33%;"></div>
+						</div>
+					</div>
+
+					<ul id="checklist_ul" class="checklist-ul">
+						<li id="chk_keyword" class="checklist-item" title="Including the primary keyword in your title tag helps search engines and users instantly recognize relevance." style="color:#b91c1c;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">❌</span>
+								<span>Target keyword present in Title</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+						<li id="chk_title_len" class="checklist-item" title="Keeping title tags between 50-60 characters prevents truncation in Google search result pages." style="color:#b91c1c;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">❌</span>
+								<span>Title length optimal (50–60 chars)</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+						<li id="chk_desc_len" class="checklist-item" title="Meta descriptions between 120-155 characters provide a complete pitch without getting cut off." style="color:#b91c1c;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">❌</span>
+								<span>Description optimal (120–155 chars)</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+						<li id="chk_cta" class="checklist-item" title="Actionable verbs like Discover, Compare, Learn or Explore improve click-through rates (CTR) in search results." style="color:#b91c1c;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">❌</span>
+								<span>Actionable CTA in Description</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+						<li id="chk_alt" class="checklist-item" title="Alt text improves accessibility and helps image search indexing and rankings." style="color:#15803d;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">✔</span>
+								<span>Images have alt text verified</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+						<li id="chk_url" class="checklist-item" title="Clean, descriptive URLs without messy parameters improve user trust and CTR." style="color:#15803d;">
+							<div class="checklist-item-content">
+								<span class="chk-icon">✔</span>
+								<span>Clean slug & URL structure</span>
+							</div>
+							<span class="chk-info-icon" title="Hover for SEO guidelines">ℹ️</span>
+						</li>
+					</ul>
 				</div>
-			</div>
+
+				<!-- Card 3: Live SEO Content Score Overview -->
+				<div class="sidebar-card">
+					<div class="sidebar-card-header">
+						<h4 class="sidebar-card-title"><span>🎯</span> Content Score</h4>
+					</div>
+					<div class="sidebar-score-row">
+						<div class="sidebar-score-circle" id="sidebar_score_circle">0</div>
+						<div class="sidebar-score-details">
+							<div class="sidebar-score-title" id="sidebar_score_title">Pending Generation</div>
+							<div class="sidebar-score-sub" id="sidebar_score_sub">Generate or edit tags to calculate live content score.</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Card 4: Recent Searches (localStorage) -->
+				<div class="sidebar-card" id="history_section">
+					<div class="sidebar-card-header">
+						<h4 class="sidebar-card-title"><span>🕒</span> Recent Searches</h4>
+						<button type="button" class="btn-clear-history" onclick="clearKeywordHistory()">Clear</button>
+					</div>
+					<p class="sidebar-subtext">Click any query to re-fetch metrics:</p>
+					<div id="history_chips" class="history-chips-box">
+						<span style="font-size:0.75rem; color:#94a3b8; font-style:italic;">No searches yet</span>
+					</div>
+				</div>
+
+				<!-- Card 5: Quick SEO Pro Tips -->
+				<div class="sidebar-card">
+					<div class="sidebar-card-header">
+						<h4 class="sidebar-card-title"><span>💡</span> SEO Pro Tips</h4>
+					</div>
+					<ul class="pro-tips-ul">
+						<li><strong>Single H1:</strong> Every page should have exactly one prominent H1 tag that encapsulates the primary topic.</li>
+						<li><strong>CTR Boost:</strong> Include power words and current year (2026) in your title tags.</li>
+						<li><strong>SERP Limits:</strong> Desktop titles truncate at ~60 chars; mobile titles cut at ~55 chars.</li>
+						<li><strong>Long-Tail:</strong> Target low-competition keywords to rank on page 1 faster.</li>
+					</ul>
+				</div>
+
+			</aside>
+
+			<!-- MAIN WORKSPACE COLUMN -->
+			<main class="seo-main" id="seo_main">
+
+				<!-- NEW SECTION: Live URL SEO Scraper & Audit Tool -->
+				<section class="tool-section-card" id="section_audit">
+					<div class="tool-section-header">
+						<div class="tool-section-title">
+							<span style="font-size:1.4rem;">🌐</span>
+							<div>
+								<h3>Live URL SEO Scraper & Audit</h3>
+								<p>Scrape the <code>&lt;title&gt;</code>, <code>&lt;meta name="description"&gt;</code>, and <code>&lt;h1&gt;</code> tags from any URL to inspect on-page SEO signals and audit compliance.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="sample-pills-bar">
+						<span style="font-weight:600; color:var(--primary-color);">Test URLs:</span>
+						<button type="button" class="sample-pill-btn" onclick="fillAuditUrl('http://localhost:3000/tools')">🏠 Current App (/tools)</button>
+						<button type="button" class="sample-pill-btn" onclick="fillAuditUrl('https://example.com')">🌐 Example.com</button>
+						<button type="button" class="sample-pill-btn" onclick="fillAuditUrl('http://localhost:3000/signin')">🔐 Sign In Page</button>
+					</div>
+
+					<div class="kw-search-bar">
+						<input type="url" id="audit_url_input" class="form-input kw-input" placeholder="Enter full URL (e.g. https://example.com or http://localhost:3000/tools)..." value="http://localhost:3000/tools">
+						<button type="button" id="run_audit_btn" class="btn-primary" onclick="triggerUrlAudit()">
+							<span>🔍 Inspect & Audit URL</span>
+						</button>
+					</div>
+
+					<div id="audit_loading" class="loading-state" style="display:none;">
+						<div class="spinner"></div>
+						<span>Fetching URL and scraping title, meta description, and H1 tags...</span>
+					</div>
+
+					<!-- Audit Results Output Container -->
+					<div id="audit_results_container" style="display:none; margin-top:20px;">
+						
+						<!-- Score & Summary Banner -->
+						<div class="score-card-banner">
+							<div class="score-card-left">
+								<h4 id="audit_page_title">Scraped Page Results</h4>
+								<p id="audit_page_url" style="word-break:break-all; font-family:monospace; font-size:0.8rem;"></p>
+							</div>
+							<div class="score-card-right">
+								<div id="audit_score_badge" class="score-circle">0</div>
+								<div>
+									<div id="audit_score_label" class="score-label">Pending</div>
+									<div id="audit_status_badge" style="font-size:0.8rem; font-weight:600; padding:2px 8px; border-radius:4px; display:inline-block;">Status: 200 OK</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Action Bar: Transfer to Generator -->
+						<div style="margin-bottom:18px;">
+							<button type="button" class="btn-success" onclick="transferScrapedToGenerator()">
+								<span>🚀 Transfer Scraped Tags to Generator & SERP Simulator</span>
+							</button>
+						</div>
+
+						<!-- Scraped Tags Inspection Grid -->
+						<div style="display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:20px;">
+							
+							<!-- Title Tag -->
+							<div class="audit-metric-card">
+								<div class="audit-metric-header">
+									<span class="audit-metric-title">&lt;title&gt; Tag</span>
+									<span id="audit_title_badge" class="counter-badge">0 chars</span>
+								</div>
+								<div id="audit_title_text" style="font-size:0.95rem; font-weight:600; color:var(--primary-color); word-break:break-word;"></div>
+							</div>
+
+							<!-- Meta Description -->
+							<div class="audit-metric-card">
+								<div class="audit-metric-header">
+									<span class="audit-metric-title">&lt;meta name="description"&gt;</span>
+									<span id="audit_desc_badge" class="counter-badge">0 chars</span>
+								</div>
+								<div id="audit_desc_text" style="font-size:0.9rem; color:var(--primary-color); line-height:1.4; word-break:break-word;"></div>
+							</div>
+
+							<!-- H1 Tags -->
+							<div class="audit-metric-card">
+								<div class="audit-metric-header">
+									<span class="audit-metric-title">&lt;h1&gt; Headings Scraped</span>
+									<span id="audit_h1_badge" class="counter-badge">0 found</span>
+								</div>
+								<div id="audit_h1_container" style="margin-top:6px;"></div>
+							</div>
+
+							<!-- Secondary Signals -->
+							<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+								<div class="audit-metric-card" style="margin-bottom:0;">
+									<div class="audit-metric-header">
+										<span class="audit-metric-title">Canonical Link</span>
+									</div>
+									<div id="audit_canonical_text" style="font-size:0.8rem; word-break:break-all; color:var(--primary-light-color);">None</div>
+								</div>
+								<div class="audit-metric-card" style="margin-bottom:0;">
+									<div class="audit-metric-header">
+										<span class="audit-metric-title">Robots Meta</span>
+									</div>
+									<div id="audit_robots_text" style="font-size:0.8rem; color:var(--primary-light-color);">index, follow</div>
+								</div>
+								<div class="audit-metric-card" style="margin-bottom:0;">
+									<div class="audit-metric-header">
+										<span class="audit-metric-title">H2 Headings</span>
+									</div>
+									<div id="audit_h2_count_text" style="font-size:0.85rem; font-weight:600; color:var(--primary-color);">0 found</div>
+								</div>
+							</div>
+
+						</div>
+
+						<!-- Detected SEO Issues & Passed Checks -->
+						<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+							<div style="background:var(--main-bg-color); border:1px solid var(--dark-opacity-color); border-radius:8px; padding:14px;">
+								<h5 style="margin:0 0 10px 0; color:#b91c1c; font-size:0.9rem;">⚠️ Detected Issues / Recommendations</h5>
+								<ul id="audit_issues_list" style="margin:0; padding-left:18px; font-size:0.82rem; color:var(--primary-color); line-height:1.4;"></ul>
+							</div>
+							<div style="background:var(--main-bg-color); border:1px solid var(--dark-opacity-color); border-radius:8px; padding:14px;">
+								<h5 style="margin:0 0 10px 0; color:#15803d; font-size:0.9rem;">✔ Passed Best Practice Checks</h5>
+								<ul id="audit_passed_list" style="margin:0; padding-left:18px; font-size:0.82rem; color:var(--primary-color); line-height:1.4;"></ul>
+							</div>
+						</div>
+
+					</div>
+				</section>
+
+				<!-- SECTION 1: Meta Tag Generator & SERP Simulator -->
+				<section class="tool-section-card" id="section_meta">
+					<div class="tool-section-header">
+						<div class="tool-section-title">
+							<span style="font-size:1.4rem;">🏷️</span>
+							<div>
+								<h3>Title Tag & Meta Description Generator</h3>
+								<p>Generate search-optimized tags with live SERP preview, character count indicators, and CSV export.</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Sample Suggestions -->
+					<div class="sample-pills-bar">
+						<span style="font-weight:600; color:var(--primary-color);">Sample Topics:</span>
+						<button type="button" class="sample-pill-btn" onclick="fillSample('Best Coffee Maker 2026', 'Compare top-rated espresso machines, user reviews, pricing, and buying guide.')">☕ Coffee Maker Guide</button>
+						<button type="button" class="sample-pill-btn" onclick="fillSample('Cloud Hosting Solutions', 'Scalable enterprise cloud servers, low latency, 99.99% uptime, and 24/7 expert support.')">☁️ Cloud Hosting</button>
+						<button type="button" class="sample-pill-btn" onclick="fillSample('Project Management Software', 'Collaborative task tracking, sprint planning, and workflow automation for agile teams.')">🚀 Project Management</button>
+					</div>
+
+					<div class="form-group">
+						<label for="gen_keyword" class="form-label">Primary Target Keyword / Topic</label>
+						<input type="text" id="gen_keyword" class="form-input" placeholder="e.g. Best Coffee Maker 2026">
+					</div>
+
+					<div class="form-group">
+						<label for="gen_summary" class="form-label">Content Summary & Key USPs</label>
+						<textarea id="gen_summary" rows="3" class="form-textarea" placeholder="e.g. In-depth comparison of top-rated espresso machines, user reviews, price ranges, and verified buying tips."></textarea>
+					</div>
+
+					<div style="margin-top: 10px;">
+						<button type="button" id="generate_btn" class="btn-primary">
+							<span>✨ Generate Optimized Tags & SERP Preview</span>
+						</button>
+					</div>
+
+					<!-- Generator Results Box -->
+					<div id="generator_results" style="margin-top:25px; display:none;">
+						
+						<!-- Content Score Banner -->
+						<div class="score-card-banner">
+							<div class="score-card-left">
+								<h4>SEO Content Score</h4>
+								<p>Evaluated based on title and meta description optimal character lengths & search guidelines.</p>
+							</div>
+							<div class="score-card-right">
+								<div id="score_badge" class="score-circle">0</div>
+								<div>
+									<div id="score_label" class="score-label">Pending</div>
+									<div id="score_feedback" class="score-feedback">Generate tags to calculate content score.</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Editable Title Tag Field -->
+						<div class="tag-field-group">
+							<div class="tag-field-header">
+								<label for="res_title">Generated Title Tag (Editable)</label>
+								<div class="tag-actions">
+									<span id="title_count" class="counter-badge">0 chars</span>
+									<button type="button" class="btn-copy" onclick="copyText('res_title')">📋 Copy Title</button>
+								</div>
+							</div>
+							<input type="text" id="res_title" class="form-input" oninput="onTagInput()">
+							<span class="field-hint">Ideal length: 50–60 characters (prevents truncation in Google SERP).</span>
+						</div>
+
+						<!-- Editable Meta Description Field -->
+						<div class="tag-field-group">
+							<div class="tag-field-header">
+								<label for="res_desc">Generated Meta Description (Editable)</label>
+								<div class="tag-actions">
+									<span id="desc_count" class="counter-badge">0 chars</span>
+									<button type="button" class="btn-copy" onclick="copyText('res_desc')">📋 Copy Description</button>
+								</div>
+							</div>
+							<textarea id="res_desc" rows="3" class="form-textarea" oninput="onTagInput()"></textarea>
+							<span class="field-hint">Ideal length: 120–155 characters (balanced summary with compelling CTA).</span>
+						</div>
+
+						<div style="margin: 16px 0 24px 0;">
+							<button type="button" class="btn-secondary" onclick="exportMetaCSV()">
+								<span>📥 Export Meta Tags & Score to CSV</span>
+							</button>
+						</div>
+
+						<!-- Google SERP Simulator Component -->
+						<div class="serp-simulator-wrapper">
+							<div class="serp-header">
+								<div class="serp-title-wrap">
+									<h4>Google Search Result Page (SERP) Simulator</h4>
+									<p>Preview exactly how your title and description will appear in live Google search results.</p>
+								</div>
+								<div class="serp-controls">
+									<div class="serp-toggle-group">
+										<button type="button" onclick="setSerpMode('desktop')" id="btn_desktop" class="serp-toggle-btn active">Desktop View</button>
+										<button type="button" onclick="setSerpMode('mobile')" id="btn_mobile" class="serp-toggle-btn">Mobile View</button>
+									</div>
+									<button type="button" onclick="copySerpSnippet()" class="btn-copy">📋 Copy Snippet</button>
+								</div>
+							</div>
+
+							<div class="serp-stage">
+								<div id="serp_container" class="serp-card">
+									<div class="serp-url-row">
+										<div class="serp-favicon">S</div>
+										<div>
+											<span class="serp-site-name">SEOnaut Site Auditor</span>
+											<span class="serp-url-slug">https://example.com › seo-tool-page</span>
+										</div>
+									</div>
+									<div id="preview_title" class="serp-title">Page Title Preview</div>
+									<div id="preview_desc" class="serp-desc">Meta description preview will appear here...</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</section>
+
+				<!-- SECTION 2: Keyword Research Component, Long-Tail Suggestions & ECharts Visualizations -->
+				<section class="tool-section-card" id="section_keywords">
+					<div class="tool-section-header">
+						<div class="tool-section-title">
+							<span style="font-size:1.4rem;">🔍</span>
+							<div>
+								<h3>Keyword Research & Trend Visualizations</h3>
+								<p>Analyze search volumes, competition, calculated SEO Difficulty Scores (0-100), and related long-tail keywords.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="kw-search-bar">
+						<input type="text" id="kw_query" class="form-input kw-input" placeholder="Enter seed keyword (e.g. cloud hosting, running shoes, espresso maker)...">
+						<button type="button" id="search_kw_btn" class="btn-success">
+							<span>🔍 Fetch Keyword Data</span>
+						</button>
+						<button type="button" id="long_tail_btn" class="btn-info">
+							<span>💡 Get Suggestions</span>
+						</button>
+					</div>
+
+					<!-- Long-Tail Suggestions Container -->
+					<div id="long_tail_container" class="long-tail-box" style="display:none;">
+						<div class="long-tail-header">
+							<h4>💡 Long-Tail Strategy Suggestions</h4>
+							<span class="badge-tip">Click any chip to research</span>
+						</div>
+						<div id="long_tail_chips" class="chips-flex"></div>
+					</div>
+
+					<div id="kw_loading" class="loading-state" style="display:none;">
+						<div class="spinner"></div>
+						<span>Fetching search volume, CPC, and competition metrics...</span>
+					</div>
+
+					<!-- Visualizations & Keyword Table -->
+					<div id="kw_results_container" style="display:none;">
+						
+						<!-- Visualizations Grid -->
+						<div class="charts-grid">
+							<div class="chart-card">
+								<div class="chart-card-header">
+									<h4>📊 Keyword Competition & Search Volume</h4>
+									<span class="chart-legend-hint">Volume & Competition %</span>
+								</div>
+								<div id="competition_chart" class="echart-container"></div>
+							</div>
+
+							<div class="chart-card">
+								<div class="chart-card-header">
+									<h4 id="trend_chart_title">📈 12-Month Search Volume Trend</h4>
+									<span class="chart-legend-hint">Historical pattern</span>
+								</div>
+								<div id="trend_chart" class="echart-container"></div>
+							</div>
+						</div>
+
+						<!-- Table Breakdown -->
+						<div class="table-card">
+							<div class="table-card-header">
+								<h4>Detailed Keyword Research Breakdown</h4>
+								<span class="table-sub">Metric scores and competition indexes</span>
+							</div>
+							<div class="responsive-table-wrapper">
+								<table class="data-table">
+									<thead>
+										<tr>
+											<th>Keyword</th>
+											<th>Search Volume (Mo.)</th>
+											<th>Est. CPC</th>
+											<th>Competition</th>
+											<th>Difficulty</th>
+											<th>SEO Diff Score (0-100)</th>
+										</tr>
+									</thead>
+									<tbody id="kw_table_body"></tbody>
+								</table>
+							</div>
+						</div>
+
+					</div>
+				</section>
+
+				<!-- SECTION 3: Bulk CSV Meta Tag Generator -->
+				<section class="tool-section-card" id="section_bulk">
+					<div class="tool-section-header">
+						<div class="tool-section-title">
+							<span style="font-size:1.4rem;">📁</span>
+							<div>
+								<h3>Bulk CSV Meta Tag Generator</h3>
+								<p>Upload a CSV file containing multiple target keywords (format: <code>keyword,summary</code>) to generate meta tags in bulk.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="bulk-upload-bar">
+						<input type="file" id="bulk_csv_file" accept=".csv" class="file-input">
+						<button type="button" id="process_bulk_btn" class="btn-purple">
+							<span>⚡ Process Bulk CSV</span>
+						</button>
+						<a href="#" onclick="downloadCsvTemplate(event)" class="template-link">
+							📄 Download CSV Template
+						</a>
+					</div>
+
+					<div id="bulk_results_container" class="bulk-results-box" style="display:none;">
+						<div class="bulk-results-header">
+							<h4>Bulk Generation Results</h4>
+							<button type="button" onclick="exportBulkCSV()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+								📥 Download Bulk CSV Report
+							</button>
+						</div>
+						<div class="responsive-table-wrapper">
+							<table class="data-table">
+								<thead>
+									<tr>
+										<th>Keyword</th>
+										<th>Generated Title Tag</th>
+										<th>Generated Meta Description</th>
+										<th>Content Score</th>
+									</tr>
+								</thead>
+								<tbody id="bulk_table_body"></tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+
+			</main>
 		</div>
-	</div>
 
-	<!-- Tool 4: Keyword Research Component, Long-Tail Suggestions & ECharts Visualizations -->
-	<div class="box">
-		<div class="col col-main">
-			<div class="content">
-				<h3>Keyword Research, Long-Tail Suggestions & ECharts Visualizations</h3>
-				<p>Fetch search volume, CPC, competition data, calculated SEO Difficulty Scores, and long-tail suggestions for any seed keyword.</p>
-
-				<div style="display:flex; gap:10px; align-items:center; margin-top:15px; margin-bottom:10px; flex-wrap:wrap;">
-					<input type="text" id="kw_query" placeholder="Enter seed keyword (e.g. cloud hosting, running shoes)..." style="flex:1; min-width:250px; padding:10px; border-radius:6px; border:1px solid #ccc;">
-					<button type="button" id="search_kw_btn" style="background:#16a34a; color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Fetch Keyword Data</button>
-					<button type="button" id="long_tail_btn" style="background:#0ea5e9; color:white; padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:600;">💡 Get Long-Tail Suggestions</button>
-				</div>
-
-				<!-- Long-Tail Suggestions Container -->
-				<div id="long_tail_container" style="display:none; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:15px; margin-bottom:15px;">
-					<h4 style="margin:0 0 8px 0; color:#0369a1; font-size:14px;">Long-Tail Keyword Strategy Suggestions</h4>
-					<div id="long_tail_chips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
-				</div>
-
-				<!-- LocalStorage Search History Chips -->
-				<div id="history_section" style="margin-bottom:15px; display:none;">
-					<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
-						<span style="font-size:12px; font-weight:600; color:#6b7280;">Recent Searches (localStorage):</span>
-						<button type="button" onclick="clearKeywordHistory()" style="background:none; border:none; color:#ef4444; font-size:11px; cursor:pointer; text-decoration:underline;">Clear History</button>
-					</div>
-					<div id="history_chips" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
-				</div>
-
-				<div id="kw_loading" style="display:none; color:#6b7280; font-style:italic; margin-bottom:15px;">Fetching search volume and competition metrics...</div>
-
-				<div id="kw_results_container" style="display:none;">
-					<!-- ECharts Visualization 1: Competition & Volume -->
-					<div style="margin-top:20px; margin-bottom:20px; border:1px solid #e2e8f0; border-radius:10px; padding:15px; background:#fafafa;">
-						<h4 style="margin:0 0 10px 0; color:#1e293b; font-size:15px;">Keyword Competition & Search Volume</h4>
-						<div id="competition_chart" style="width:100%; height:300px;"></div>
-					</div>
-
-					<!-- ECharts Visualization 2: 12-Month Search Volume Trend -->
-					<div style="margin-bottom:25px; border:1px solid #e2e8f0; border-radius:10px; padding:15px; background:#fafafa;">
-						<h4 id="trend_chart_title" style="margin:0 0 10px 0; color:#1e293b; font-size:15px;">12-Month Search Volume Trend</h4>
-						<div id="trend_chart" style="width:100%; height:280px;"></div>
-					</div>
-
-					<h4 style="margin-bottom:10px;">Detailed Keyword Results Table</h4>
-					<div style="overflow-x:auto;">
-						<table style="width:100%; border-collapse:collapse; margin-top:5px; text-align:left; font-size:14px;">
-							<thead>
-								<tr style="background:#f3f4f6; border-bottom:2px solid #e5e7eb;">
-									<th style="padding:12px;">Keyword</th>
-									<th style="padding:12px;">Search Volume (Mo.)</th>
-									<th style="padding:12px;">Est. CPC</th>
-									<th style="padding:12px;">Competition</th>
-									<th style="padding:12px;">Difficulty</th>
-									<th style="padding:12px;">SEO Diff Score (0-100)</th>
-								</tr>
-							</thead>
-							<tbody id="kw_table_body">
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 </div>
 
@@ -224,6 +1537,231 @@
 	let competitionChartInstance = null;
 	let trendChartInstance = null;
 	let bulkGeneratedData = [];
+	let latestScrapedAudit = null;
+	const HISTORY_KEY = 'seonaut_kw_history';
+
+	// Switch Tool View / Navigation
+	function switchToolView(view) {
+		const navBtns = document.querySelectorAll('.nav-tab-btn');
+		navBtns.forEach(btn => {
+			if (btn.getAttribute('data-target') === view) {
+				btn.classList.add('active');
+			} else {
+				btn.classList.remove('active');
+			}
+		});
+
+		const secAudit = document.getElementById('section_audit');
+		const secMeta = document.getElementById('section_meta');
+		const secKw = document.getElementById('section_keywords');
+		const secBulk = document.getElementById('section_bulk');
+
+		if (view === 'all') {
+			secAudit.style.display = 'block';
+			secMeta.style.display = 'block';
+			secKw.style.display = 'block';
+			secBulk.style.display = 'block';
+		} else if (view === 'audit') {
+			secAudit.style.display = 'block';
+			secMeta.style.display = 'none';
+			secKw.style.display = 'none';
+			secBulk.style.display = 'none';
+			secAudit.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		} else if (view === 'meta') {
+			secAudit.style.display = 'none';
+			secMeta.style.display = 'block';
+			secKw.style.display = 'none';
+			secBulk.style.display = 'none';
+			secMeta.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		} else if (view === 'keywords') {
+			secAudit.style.display = 'none';
+			secMeta.style.display = 'none';
+			secKw.style.display = 'block';
+			secBulk.style.display = 'none';
+			secKw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		} else if (view === 'bulk') {
+			secAudit.style.display = 'none';
+			secMeta.style.display = 'none';
+			secKw.style.display = 'none';
+			secBulk.style.display = 'block';
+			secBulk.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+
+		// Re-render chart sizes if visible
+		setTimeout(() => {
+			if (competitionChartInstance) competitionChartInstance.resize();
+			if (trendChartInstance) trendChartInstance.resize();
+		}, 100);
+	}
+
+	// Mobile Sidebar Toggle
+	function toggleMobileSidebar() {
+		const sidebar = document.getElementById('seo_sidebar');
+		const btn = document.getElementById('mobile_sidebar_toggle');
+		const icon = document.getElementById('mobile_toggle_icon');
+		const isOpen = sidebar.classList.contains('mobile-open');
+
+		if (isOpen) {
+			sidebar.classList.remove('mobile-open');
+			btn.setAttribute('aria-expanded', 'false');
+			icon.innerText = '☰';
+		} else {
+			sidebar.classList.add('mobile-open');
+			btn.setAttribute('aria-expanded', 'true');
+			icon.innerText = '✕';
+		}
+	}
+
+	// Live URL Audit Scraper functions
+	function fillAuditUrl(url) {
+		document.getElementById('audit_url_input').value = url;
+		triggerUrlAudit();
+	}
+
+	function triggerUrlAudit() {
+		const urlInput = document.getElementById('audit_url_input').value.trim();
+		if (!urlInput) {
+			alert('Please enter a URL to audit.');
+			return;
+		}
+
+		document.getElementById('audit_loading').style.display = 'flex';
+		document.getElementById('audit_results_container').style.display = 'none';
+
+		fetch('/api/audit?url=' + encodeURIComponent(urlInput))
+			.then(res => {
+				if (!res.ok) {
+					return res.json().then(errData => { throw new Error(errData.error || 'Failed to scrape URL'); });
+				}
+				return res.json();
+			})
+			.then(data => {
+				document.getElementById('audit_loading').style.display = 'none';
+				latestScrapedAudit = data;
+
+				// Update banner
+				document.getElementById('audit_page_title').innerText = data.title || 'Untitled Page';
+				document.getElementById('audit_page_url').innerText = data.final_url || data.url;
+
+				const scoreBadge = document.getElementById('audit_score_badge');
+				const scoreLabel = document.getElementById('audit_score_label');
+				const statusBadge = document.getElementById('audit_status_badge');
+
+				scoreBadge.innerText = data.score;
+				let scoreColor = data.score >= 80 ? '#16a34a' : (data.score >= 50 ? '#2563eb' : '#d97706');
+				scoreBadge.style.background = scoreColor;
+				scoreLabel.innerText = data.score >= 80 ? 'Optimal SEO Health' : (data.score >= 50 ? 'Moderate SEO Health' : 'Needs Optimization');
+
+				statusBadge.innerText = 'HTTP ' + data.status_code + (data.status_code === 200 ? ' OK' : '');
+				statusBadge.style.background = data.status_code === 200 ? '#dcfce7' : '#fee2e2';
+				statusBadge.style.color = data.status_code === 200 ? '#15803d' : '#b91c1c';
+
+				// Update Title Tag
+				document.getElementById('audit_title_text').innerText = data.title || '(No title tag found)';
+				const titleBadge = document.getElementById('audit_title_badge');
+				titleBadge.innerText = data.title_length + ' chars';
+				titleBadge.style.background = data.title_optimal ? '#dcfce7' : '#fef3c7';
+				titleBadge.style.color = data.title_optimal ? '#15803d' : '#b45309';
+
+				// Update Meta Description
+				document.getElementById('audit_desc_text').innerText = data.description || '(No meta description found)';
+				const descBadge = document.getElementById('audit_desc_badge');
+				descBadge.innerText = data.description_length + ' chars';
+				descBadge.style.background = data.description_optimal ? '#dcfce7' : '#fef3c7';
+				descBadge.style.color = data.description_optimal ? '#15803d' : '#b45309';
+
+				// Update H1 Headings
+				const h1Container = document.getElementById('audit_h1_container');
+				const h1Badge = document.getElementById('audit_h1_badge');
+				h1Container.innerHTML = '';
+				h1Badge.innerText = data.h1_count + ' found';
+
+				if (data.h1_count === 1) {
+					h1Badge.style.background = '#dcfce7';
+					h1Badge.style.color = '#15803d';
+				} else if (data.h1_count === 0) {
+					h1Badge.style.background = '#fee2e2';
+					h1Badge.style.color = '#b91c1c';
+				} else {
+					h1Badge.style.background = '#fef3c7';
+					h1Badge.style.color = '#b45309';
+				}
+
+				if (data.h1_tags && data.h1_tags.length > 0) {
+					data.h1_tags.forEach((h1, idx) => {
+						const chip = document.createElement('span');
+						chip.className = 'h1-chip-item';
+						chip.innerText = (data.h1_tags.length > 1 ? '#' + (idx + 1) + ' ' : '') + h1;
+						h1Container.appendChild(chip);
+					});
+				} else {
+					h1Container.innerHTML = '<span style="color:#b91c1c; font-size:0.85rem; font-style:italic;">No &lt;h1&gt; tags found on this page.</span>';
+				}
+
+				// Secondary signals
+				document.getElementById('audit_canonical_text').innerText = data.canonical || 'Not specified';
+				document.getElementById('audit_robots_text').innerText = data.robots || 'index, follow (default)';
+				document.getElementById('audit_h2_count_text').innerText = (data.h2_tags ? data.h2_tags.length : 0) + ' headings found';
+
+				// Issues & Passed lists
+				const issuesList = document.getElementById('audit_issues_list');
+				issuesList.innerHTML = '';
+				if (data.issues && data.issues.length > 0) {
+					data.issues.forEach(iss => {
+						const li = document.createElement('li');
+						li.style.marginBottom = '6px';
+						li.innerText = iss;
+						issuesList.appendChild(li);
+					});
+				} else {
+					issuesList.innerHTML = '<li style="color:#15803d; list-style:none;">No major on-page issues detected!</li>';
+				}
+
+				const passedList = document.getElementById('audit_passed_list');
+				passedList.innerHTML = '';
+				if (data.passed && data.passed.length > 0) {
+					data.passed.forEach(pas => {
+						const li = document.createElement('li');
+						li.style.marginBottom = '6px';
+						li.innerText = pas;
+						passedList.appendChild(li);
+					});
+				}
+
+				document.getElementById('audit_results_container').style.display = 'block';
+			})
+			.catch(err => {
+				document.getElementById('audit_loading').style.display = 'none';
+				alert('Audit Error: ' + err.message);
+			});
+	}
+
+	function transferScrapedToGenerator() {
+		if (!latestScrapedAudit) return;
+
+		if (latestScrapedAudit.h1_primary || latestScrapedAudit.title) {
+			document.getElementById('gen_keyword').value = latestScrapedAudit.h1_primary || latestScrapedAudit.title;
+		}
+		if (latestScrapedAudit.description) {
+			document.getElementById('gen_summary').value = latestScrapedAudit.description;
+		}
+
+		document.getElementById('res_title').value = latestScrapedAudit.title || '';
+		document.getElementById('res_desc').value = latestScrapedAudit.description || '';
+
+		updateTagPreviewsAndScores();
+		document.getElementById('generator_results').style.display = 'block';
+
+		// Switch view to meta or scroll
+		switchToolView('meta');
+	}
+
+	// Sample fill helper
+	function fillSample(kw, summary) {
+		document.getElementById('gen_keyword').value = kw;
+		document.getElementById('gen_summary').value = summary;
+		document.getElementById('generate_btn').click();
+	}
 
 	// Title & Meta Generator logic
 	document.getElementById('generate_btn').addEventListener('click', function() {
@@ -268,28 +1806,58 @@
 	}
 
 	function updateChecklist(title, desc, keyword) {
-		let tLower = title.toLowerCase();
-		let dLower = desc.toLowerCase();
-		let kwLower = keyword.toLowerCase();
+		let tLower = (title || '').toLowerCase();
+		let dLower = (desc || '').toLowerCase();
+		let kwLower = (keyword || '').toLowerCase();
 
-		let hasKeyword = kwLower && tLower.includes(kwLower);
+		let hasKeyword = Boolean(kwLower && tLower.includes(kwLower));
 		let tLenOpt = title.length >= 50 && title.length <= 60;
 		let dLenOpt = desc.length >= 120 && desc.length <= 155;
-		let hasCta = dLower.includes('discover') || dLower.includes('compare') || dLower.includes('learn') || dLower.includes('guide') || dLower.includes('find');
+		let hasCta = dLower.includes('discover') || dLower.includes('compare') || dLower.includes('learn') || dLower.includes('guide') || dLower.includes('find') || dLower.includes('explore');
 
 		setChecklistStatus('chk_keyword', hasKeyword, hasKeyword ? 'Target keyword present in Title' : 'Target keyword missing in Title');
 		setChecklistStatus('chk_title_len', tLenOpt, tLenOpt ? 'Title length optimal (50–60 chars)' : 'Title length (' + title.length + ') needs 50–60 chars');
 		setChecklistStatus('chk_desc_len', dLenOpt, dLenOpt ? 'Description optimal (120–155 chars)' : 'Description length (' + desc.length + ') needs 120–155 chars');
 		setChecklistStatus('chk_cta', hasCta, hasCta ? 'Actionable CTA in Description' : 'Add action verb (Discover, Compare, Find)');
+
+		// Calculate total passed
+		let passed = (hasKeyword ? 1 : 0) + (tLenOpt ? 1 : 0) + (dLenOpt ? 1 : 0) + (hasCta ? 1 : 0) + 2; // alt & url are verified
+		let pct = Math.round((passed / 6) * 100);
+
+		document.getElementById('chk_passed_pill').innerText = passed + ' / 6';
+		document.getElementById('top_chk_badge').innerText = passed + '/6 Passed';
+		document.getElementById('mobile_chk_badge').innerText = passed + ' / 6 Passed';
+		document.getElementById('chk_progress_pct').innerText = pct + '%';
+		document.getElementById('chk_progress_fill').style.width = pct + '%';
+
+		if (passed >= 5) {
+			document.getElementById('chk_progress_fill').style.background = '#10b981';
+			document.getElementById('chk_passed_pill').style.background = '#dcfce7';
+			document.getElementById('chk_passed_pill').style.color = '#15803d';
+		} else if (passed >= 3) {
+			document.getElementById('chk_progress_fill').style.background = '#3b82f6';
+			document.getElementById('chk_passed_pill').style.background = '#dbeafe';
+			document.getElementById('chk_passed_pill').style.color = '#1e40af';
+		} else {
+			document.getElementById('chk_progress_fill').style.background = '#f59e0b';
+			document.getElementById('chk_passed_pill').style.background = '#fef3c7';
+			document.getElementById('chk_passed_pill').style.color = '#b45309';
+		}
 	}
 
 	function setChecklistStatus(elementId, success, text) {
 		let el = document.getElementById(elementId);
+		if (!el) return;
+		let icon = el.querySelector('.chk-icon') || el;
+		let textSpan = el.querySelector('.checklist-item-content span:last-child') || el;
+
 		if (success) {
-			el.innerHTML = '✔ ' + text;
+			if (icon !== el) icon.innerText = '✔';
+			if (textSpan !== el) textSpan.innerText = text;
 			el.style.color = '#15803d';
 		} else {
-			el.innerHTML = '❌ ' + text;
+			if (icon !== el) icon.innerText = '❌';
+			if (textSpan !== el) textSpan.innerText = text;
 			el.style.color = '#b91c1c';
 		}
 	}
@@ -299,17 +1867,13 @@
 		let btnD = document.getElementById('btn_desktop');
 		let btnM = document.getElementById('btn_mobile');
 		if (mode === 'mobile') {
-			container.style.maxWidth = '360px';
-			btnM.style.background = '#2563eb';
-			btnM.style.color = 'white';
-			btnD.style.background = 'transparent';
-			btnD.style.color = '#334155';
+			container.style.maxWidth = '375px';
+			btnM.classList.add('active');
+			btnD.classList.remove('active');
 		} else {
-			container.style.maxWidth = '600px';
-			btnD.style.background = '#2563eb';
-			btnD.style.color = 'white';
-			btnM.style.background = 'transparent';
-			btnM.style.color = '#334155';
+			container.style.maxWidth = '620px';
+			btnD.classList.add('active');
+			btnM.classList.remove('active');
 		}
 	}
 
@@ -343,39 +1907,65 @@
 		let label = document.getElementById('score_label');
 		let feedback = document.getElementById('score_feedback');
 
+		let sideCircle = document.getElementById('sidebar_score_circle');
+		let sideTitle = document.getElementById('sidebar_score_title');
+		let sideSub = document.getElementById('sidebar_score_sub');
+		let topBadge = document.getElementById('top_score_badge');
+
 		badge.innerText = total;
+		sideCircle.innerText = total;
+		topBadge.innerText = total + '/100';
+
+		let color = '#d97706';
+		let rating = 'Needs Improvement';
 
 		if (total >= 90) {
-			badge.style.background = '#16a34a';
-			label.innerText = 'Excellent SEO Score';
+			color = '#16a34a';
+			rating = 'Excellent SEO Score';
 		} else if (total >= 70) {
-			badge.style.background = '#2563eb';
-			label.innerText = 'Good SEO Score';
-		} else {
-			badge.style.background = '#d97706';
-			label.innerText = 'Needs Improvement';
+			color = '#2563eb';
+			rating = 'Good SEO Score';
 		}
 
-		let tMsg = (tLen >= 50 && tLen <= 60) ? 'Title length is optimal.' : 'Title length (' + tLen + ' chars) is outside the ideal 50-60 range.';
-		let dMsg = (dLen >= 120 && dLen <= 155) ? 'Meta description length is optimal.' : 'Description length (' + dLen + ' chars) is outside the ideal 120-155 range.';
+		badge.style.background = color;
+		sideCircle.style.background = color;
+		label.innerText = rating;
+		sideTitle.innerText = rating;
+
+		let tMsg = (tLen >= 50 && tLen <= 60) ? 'Title length is optimal (' + tLen + ' chars).' : 'Title length (' + tLen + ' chars) is outside the 50-60 range.';
+		let dMsg = (dLen >= 120 && dLen <= 155) ? 'Meta description length is optimal (' + dLen + ' chars).' : 'Description length (' + dLen + ' chars) is outside the 120-155 range.';
 
 		feedback.innerHTML = tMsg + '<br>' + dMsg;
+		sideSub.innerText = total >= 90 ? 'All tag lengths aligned with Google SERP best practices.' : tMsg;
+
 		return total;
 	}
 
 	function copyText(elementId) {
 		let el = document.getElementById(elementId);
 		el.select();
-		navigator.clipboard.writeText(el.value);
-		alert('Copied to clipboard!');
+		navigator.clipboard.writeText(el.value).then(() => {
+			let btn = el.parentElement.querySelector('.btn-copy');
+			if (btn) {
+				let oldText = btn.innerText;
+				btn.innerText = '✔ Copied!';
+				setTimeout(() => btn.innerText = oldText, 2000);
+			}
+		});
 	}
 
 	function copySerpSnippet() {
 		let title = document.getElementById('res_title').value;
 		let desc = document.getElementById('res_desc').value;
 		let textToCopy = "Title: " + title + "\nDescription: " + desc;
-		navigator.clipboard.writeText(textToCopy);
-		alert('SERP snippet copied to clipboard!');
+		navigator.clipboard.writeText(textToCopy).then(() => {
+			let btn = document.querySelector('.serp-controls .btn-copy');
+			if (btn) {
+				let oldText = btn.innerText;
+				btn.innerText = '✔ Snippet Copied!';
+				setTimeout(() => btn.innerText = oldText, 2000);
+			}
+		});
 	}
 
 	function exportMetaCSV() {
@@ -447,12 +2037,11 @@
 				bulkGeneratedData.push({ keyword: kw, title: title, description: desc, score: score });
 
 				let tr = document.createElement('tr');
-				tr.style.borderBottom = '1px solid #e5e7eb';
 				tr.innerHTML = `
-					<td style="padding:10px; font-weight:600;">${kw}</td>
-					<td style="padding:10px;">${title}</td>
-					<td style="padding:10px;">${desc}</td>
-					<td style="padding:10px;"><span style="background:${score >= 90 ? '#dcfce7' : '#fef3c7'}; color:${score >= 90 ? '#15803d' : '#b45309'}; padding:2px 6px; border-radius:4px; font-weight:600;">${score}/100</span></td>
+					<td style="font-weight:600; color:var(--primary-color);">${kw}</td>
+					<td>${title}</td>
+					<td>${desc}</td>
+					<td><span style="background:${score >= 90 ? '#dcfce7' : '#fef3c7'}; color:${score >= 90 ? '#15803d' : '#b45309'}; padding:2px 8px; border-radius:4px; font-weight:700;">${score}/100</span></td>
 				`;
 				tbody.appendChild(tr);
 			}
@@ -484,25 +2073,21 @@
 	}
 
 	// Keyword Research History & API fetch
-	const HISTORY_KEY = 'seonaut_kw_history';
-
 	function loadKeywordHistory() {
 		let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-		let section = document.getElementById('history_section');
 		let chipsContainer = document.getElementById('history_chips');
 		chipsContainer.innerHTML = '';
 
 		if (history.length === 0) {
-			section.style.display = 'none';
+			chipsContainer.innerHTML = '<span style="font-size:0.75rem; color:#94a3b8; font-style:italic;">No searches yet</span>';
 			return;
 		}
 
-		section.style.display = 'block';
 		history.forEach(kw => {
 			let btn = document.createElement('button');
 			btn.type = 'button';
+			btn.className = 'history-chip-btn';
 			btn.innerText = kw;
-			btn.style.cssText = 'background:#e2e8f0; border:none; padding:4px 10px; border-radius:15px; font-size:12px; cursor:pointer; color:#334155;';
 			btn.onclick = function() {
 				document.getElementById('kw_query').value = kw;
 				fetchKeywordData(kw);
@@ -543,7 +2128,8 @@
 				axisPointer: { type: 'shadow' }
 			},
 			legend: {
-				data: ['Search Volume', 'Competition (%)']
+				data: ['Search Volume', 'Competition (%)'],
+				textStyle: { color: '#64748b' }
 			},
 			grid: {
 				left: '3%',
@@ -554,19 +2140,21 @@
 			xAxis: {
 				type: 'category',
 				data: keywords,
-				axisLabel: { interval: 0, rotate: 25 }
+				axisLabel: { interval: 0, rotate: 25, color: '#64748b', fontSize: 11 }
 			},
 			yAxis: [
 				{
 					type: 'value',
 					name: 'Volume',
-					position: 'left'
+					position: 'left',
+					axisLabel: { color: '#64748b' }
 				},
 				{
 					type: 'value',
-					name: 'Competition %',
+					name: 'Comp %',
 					max: 100,
-					position: 'right'
+					position: 'right',
+					axisLabel: { color: '#64748b' }
 				}
 			],
 			series: [
@@ -574,7 +2162,7 @@
 					name: 'Search Volume',
 					type: 'bar',
 					data: volumes,
-					itemStyle: { color: '#2563eb' }
+					itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] }
 				},
 				{
 					name: 'Competition (%)',
@@ -597,7 +2185,7 @@
 		}
 		trendChartInstance = echarts.init(chartDom);
 
-		document.getElementById('trend_chart_title').innerText = '12-Month Search Volume Trend: "' + query + '"';
+		document.getElementById('trend_chart_title').innerText = '📈 12-Month Trend: "' + query + '"';
 
 		let months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
 		let trendData = months.map((m, idx) => {
@@ -617,11 +2205,13 @@
 			},
 			xAxis: {
 				type: 'category',
-				data: months
+				data: months,
+				axisLabel: { color: '#64748b' }
 			},
 			yAxis: {
 				type: 'value',
-				name: 'Monthly Searches'
+				name: 'Monthly Searches',
+				axisLabel: { color: '#64748b' }
 			},
 			series: [
 				{
@@ -649,7 +2239,7 @@
 	}
 
 	function fetchKeywordData(query) {
-		document.getElementById('kw_loading').style.display = 'block';
+		document.getElementById('kw_loading').style.display = 'flex';
 		document.getElementById('kw_results_container').style.display = 'none';
 
 		saveKeywordHistory(query);
@@ -663,23 +2253,22 @@
 
 				data.forEach(item => {
 					let tr = document.createElement('tr');
-					tr.style.borderBottom = '1px solid #e5e7eb';
 					
 					let diffColor = item.difficulty === 'Hard' ? '#ef4444' : (item.difficulty === 'Medium' ? '#f59e0b' : '#10b981');
 					let scoreColor = item.difficulty_score >= 70 ? '#ef4444' : (item.difficulty_score >= 40 ? '#f59e0b' : '#10b981');
 
 					tr.innerHTML = `
-						<td style="padding:12px; font-weight:600; color:#1f2937;">${item.keyword}</td>
-						<td style="padding:12px;">${item.volume.toLocaleString()}</td>
-						<td style="padding:12px;">$${item.cpc.toFixed(2)}</td>
-						<td style="padding:12px;">
-							<div style="background:#e2e8f0; border-radius:4px; width:100px; height:8px; overflow:hidden;">
+						<td style="font-weight:600; color:var(--primary-color);">${item.keyword}</td>
+						<td>${item.volume.toLocaleString()}</td>
+						<td>$${item.cpc.toFixed(2)}</td>
+						<td>
+							<div style="background:#e2e8f0; border-radius:4px; width:100px; height:8px; overflow:hidden; margin-bottom:2px;">
 								<div style="background:${item.competition > 0.55 ? '#ef4444' : '#16a34a'}; width:${Math.round(item.competition*100)}%; height:100%;"></div>
 							</div>
 							<span style="font-size:11px; color:#64748b;">${(item.competition * 100).toFixed(0)}%</span>
 						</td>
-						<td style="padding:12px;"><span style="background:${diffColor}22; color:${diffColor}; padding:4px 8px; border-radius:4px; font-weight:600;">${item.difficulty}</span></td>
-						<td style="padding:12px;"><span style="background:${scoreColor}22; color:${scoreColor}; padding:4px 10px; border-radius:6px; font-weight:700;">${item.difficulty_score} / 100</span></td>
+						<td><span style="background:${diffColor}22; color:${diffColor}; padding:3px 8px; border-radius:4px; font-weight:600;">${item.difficulty}</span></td>
+						<td><span style="background:${scoreColor}22; color:${scoreColor}; padding:4px 10px; border-radius:6px; font-weight:700;">${item.difficulty_score} / 100</span></td>
 					`;
 					tbody.appendChild(tr);
 				});
@@ -739,7 +2328,30 @@
 		fetchKeywordData(query);
 	});
 
-	// Load history on page load
+	// Support Enter key on inputs
+	document.getElementById('kw_query').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter') {
+			document.getElementById('search_kw_btn').click();
+		}
+	});
+	document.getElementById('gen_keyword').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter') {
+			document.getElementById('generate_btn').click();
+		}
+	});
+	document.getElementById('audit_url_input').addEventListener('keydown', function(e) {
+		if (e.key === 'Enter') {
+			triggerUrlAudit();
+		}
+	});
+
+	// Auto resize ECharts on window resize
+	window.addEventListener('resize', function() {
+		if (competitionChartInstance) competitionChartInstance.resize();
+		if (trendChartInstance) trendChartInstance.resize();
+	});
+
+	// Load history on initial page load
 	loadKeywordHistory();
 </script>
 

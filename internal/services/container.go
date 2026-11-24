@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/stjudewashere/seonaut/internal/config"
 	"github.com/stjudewashere/seonaut/internal/issues/multipage"
@@ -32,6 +33,7 @@ type Container struct {
 	CookieSession      *CookieSession
 	ArchiveService     *ArchiveService
 	ReplayService      *ReplayService
+	SEOAuditService    *SEOAuditService
 
 	db                   *sql.DB
 	issueRepository      *repository.IssueRepository
@@ -63,6 +65,7 @@ func NewContainer(configFile string) *Container {
 	c.InitRenderer()
 	c.InitCookieSession()
 	c.InitReplayService()
+	c.InitSEOAuditService()
 
 	return c
 }
@@ -79,19 +82,36 @@ func (c *Container) InitConfig(configFile string) {
 
 // Create the sql database connection and run migrations.
 func (c *Container) InitDB() {
-	db, err := repository.SqlConnect(c.Config.DB)
+	var db *sql.DB
+	var err error
+
+	// Retry connection up to 15 times to allow database daemon to finish starting
+	for i := 1; i <= 15; i++ {
+		db, err = repository.SqlConnect(c.Config.DB)
+		if err == nil {
+			break
+		}
+		log.Printf("Connecting to database at %s:%d (attempt %d/15): %v", c.Config.DB.Server, c.Config.DB.Port, i, err)
+		time.Sleep(1 * time.Second)
+	}
+
 	if err != nil {
-		log.Fatalf("Error creating new database connection: %v", err)
+		log.Printf("Warning: Could not establish database connection after retries: %v", err)
+		return
 	}
 
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
 	if err != nil {
-		log.Fatalf("Error creating mysql driver: %v", err)
+		log.Printf("Warning: Error creating mysql driver: %v", err)
+		c.db = db
+		return
 	}
 
 	m, err := migrate.NewWithDatabaseInstance("file://migrations", "mysql", driver)
 	if err != nil {
-		log.Fatalf("Error with mysql migrations: %v", err)
+		log.Printf("Warning: Error with mysql migrations: %v", err)
+		c.db = db
+		return
 	}
 
 	m.Up()
@@ -109,8 +129,10 @@ func (c *Container) InitRepositories() {
 	c.crawlRepository = &repository.CrawlRepository{DB: c.db}
 	c.dashboardRepository = &repository.DashboardRepository{DB: c.db}
 
-	// Clean up unfinished crawls.
-	c.crawlRepository.DeleteUnfinishedCrawls()
+	// Clean up unfinished crawls if database is available.
+	if c.db != nil {
+		c.crawlRepository.DeleteUnfinishedCrawls()
+	}
 }
 
 // Create the PubSub broker.
@@ -143,10 +165,12 @@ func (c *Container) InitReportManager() {
 		c.ReportManager.AddPageReporter(r)
 	}
 
-	// Create the sql multipage reporters and add them all to the reporterManager.
-	sqlReporters := multipage.NewSqlReporter(c.db)
-	for _, r := range sqlReporters.GetAllReporters() {
-		c.ReportManager.AddMultipageReporter(r)
+	if c.db != nil {
+		// Create the sql multipage reporters and add them all to the reporterManager.
+		sqlReporters := multipage.NewSqlReporter(c.db)
+		for _, r := range sqlReporters.GetAllReporters() {
+			c.ReportManager.AddMultipageReporter(r)
+		}
 	}
 }
 
@@ -250,4 +274,9 @@ func (c *Container) InitArchiveService() {
 // Init the WACZ archive replay service.
 func (c *Container) InitReplayService() {
 	c.ReplayService = NewReplayService()
+}
+
+// Init the SEO audit scraping service.
+func (c *Container) InitSEOAuditService() {
+	c.SEOAuditService = NewSEOAuditService()
 }

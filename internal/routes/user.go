@@ -52,6 +52,8 @@ func (h *userHandler) signupPostHandler(w http.ResponseWriter, r *http.Request) 
 			errorMsg = "Password is not valid."
 		case services.ErrInvalidEmail:
 			errorMsg = "Email address is not valid."
+		case services.ErrUserExists:
+			errorMsg = "An account with this email address already exists."
 		default:
 			log.Printf("sign up error: %v", err)
 		}

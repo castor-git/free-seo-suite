@@ -7,6 +7,8 @@ import (
 )
 
 func TestLoadConfig(t *testing.T) {
+	t.Setenv("PORT", "")
+
 	config, err := config.NewConfig("./testdata/config")
 	if err != nil {
 		t.Fatalf("Error loading config file: %v", err)

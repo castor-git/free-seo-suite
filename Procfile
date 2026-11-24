@@ -1,1 +1,1 @@
-web: ./seonaut -c config
+web: ./start.sh

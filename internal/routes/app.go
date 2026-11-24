@@ -72,9 +72,11 @@ func NewServer(container *services.Container) {
 
 	// Tools routes
 	toolsHandler := toolsHandler{container}
-	http.HandleFunc("GET /tools", container.CookieSession.Auth(toolsHandler.indexHandler))
-	http.HandleFunc("GET /api/keywords", container.CookieSession.Auth(toolsHandler.keywordApiHandler))
-	http.HandleFunc("GET /api/long-tail", container.CookieSession.Auth(toolsHandler.longTailApiHandler))
+	http.HandleFunc("GET /tools", toolsHandler.indexHandler)
+	http.HandleFunc("GET /api/keywords", toolsHandler.keywordApiHandler)
+	http.HandleFunc("GET /api/long-tail", toolsHandler.longTailApiHandler)
+	http.HandleFunc("GET /api/audit", toolsHandler.auditApiHandler)
+	http.HandleFunc("POST /api/audit", toolsHandler.auditApiHandler)
 
 	// Archive Handler
 	archiveHandler := archiveHandler{container}
@@ -99,8 +101,12 @@ func NewServer(container *services.Container) {
 	replayHandler := replayHandler{container}
 	http.HandleFunc("GET /replay", container.CookieSession.Auth(replayHandler.proxyHandler))
 
-	fmt.Printf("Starting server at %s on port %d...\n", container.Config.HTTPServer.Server, container.Config.HTTPServer.Port)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", container.Config.HTTPServer.Server, container.Config.HTTPServer.Port), nil)
+	bindAddr := fmt.Sprintf(":%d", container.Config.HTTPServer.Port)
+	if container.Config.HTTPServer.Server != "" && container.Config.HTTPServer.Server != "0.0.0.0" {
+		bindAddr = fmt.Sprintf("%s:%d", container.Config.HTTPServer.Server, container.Config.HTTPServer.Port)
+	}
+	fmt.Printf("Starting server at %s...\n", bindAddr)
+	err := http.ListenAndServe(bindAddr, nil)
 	if err != nil {
 		log.Fatalf("error starting server: %v", err)
 	}

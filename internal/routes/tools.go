@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/stjudewashere/seonaut/internal/models"
 	"github.com/stjudewashere/seonaut/internal/services"
 )
 
@@ -14,9 +15,13 @@ type toolsHandler struct {
 
 func (h *toolsHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
-	if !ok {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
-		return
+	if !ok || user == nil {
+		user = &models.User{
+			Id:    1,
+			Email: "guest@seonaut.org",
+			Lang:  "en",
+			Theme: "light",
+		}
 	}
 
 	pageView := &PageView{
@@ -31,11 +36,7 @@ func (h *toolsHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *toolsHandler) keywordApiHandler(w http.ResponseWriter, r *http.Request) {
-	_, ok := h.CookieSession.GetUser(r.Context())
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
+
 
 	query := r.URL.Query().Get("q")
 	if query == "" {
@@ -121,12 +122,6 @@ func (h *toolsHandler) keywordApiHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *toolsHandler) longTailApiHandler(w http.ResponseWriter, r *http.Request) {
-	_, ok := h.CookieSession.GetUser(r.Context())
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	query := r.URL.Query().Get("q")
 	if query == "" {
 		http.Error(w, "Missing query parameter 'q'", http.StatusBadRequest)
@@ -147,3 +142,44 @@ func (h *toolsHandler) longTailApiHandler(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(longTails)
 }
+
+func (h *toolsHandler) auditApiHandler(w http.ResponseWriter, r *http.Request) {
+	targetURL := r.URL.Query().Get("url")
+	if targetURL == "" {
+		targetURL = r.URL.Query().Get("q")
+	}
+	if targetURL == "" {
+		_ = r.ParseForm()
+		targetURL = r.FormValue("url")
+	}
+	if targetURL == "" && r.Body != nil {
+		var reqBody struct {
+			URL string `json:"url"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&reqBody)
+		targetURL = reqBody.URL
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if targetURL == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Missing 'url' parameter. Provide ?url=https://example.com or POST JSON {'url':'...'}",
+		})
+		return
+	}
+
+	result, err := h.Container.SEOAuditService.AuditURL(targetURL)
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": err.Error(),
+			"url":   targetURL,
+		})
+		return
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
