@@ -1,0 +1,1 @@
+web: ./seonaut -c config
